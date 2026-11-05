@@ -1,0 +1,3282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b5e43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Poker lernen">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Poker lernen</title>
+<style>
+:root {
+  --felt: #1b5e43; --felt-dark: #0f3f2c; --felt-light: #26795a;
+  --paper: #fbf8f1; --red: #c0392b; --black: #1b1b1b;
+  --gold: #f2c14e; --gold-dark: #d9a62f;
+  --text: #f3f7f4; --muted: rgba(243, 247, 244, 0.72);
+  --good: #7fd69a; --bad: #ff9e94; --panel: rgba(0, 0, 0, 0.24);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+button, a, .choice, .hand-choice, .card-btn, .start-grid td { touch-action: manipulation; } /* kein Doppeltipp-Zoom auf Knöpfen und Tabellenfeldern */
+body {
+  margin: 0; min-height: 100vh; min-height: 100dvh; color: var(--text);
+  font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: radial-gradient(ellipse at 50% 20%, var(--felt-light), var(--felt) 45%, var(--felt-dark) 100%) fixed;
+}
+#app {
+  max-width: 1040px; margin: 0 auto;
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+h1 { font-size: 1.7rem; margin: 0.6em 0 0.3em; }
+h2 { font-size: 1.25rem; margin: 0 0 0.4em; }
+.lead { color: var(--muted); margin-top: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 0 10px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.brand { color: var(--text); text-decoration: none; font-weight: 700; white-space: nowrap; }
+@media (max-width: 480px) {
+  .topbar { flex-wrap: wrap; }
+  .topbar .btn { min-height: 44px; padding: 8px 12px; font-size: 0.9rem; }
+}
+.btn {
+  appearance: none; border: 0; border-radius: 12px; min-height: 44px; padding: 10px 18px;
+  font: inherit; font-weight: 650; cursor: pointer; background: var(--gold); color: #2a2208;
+  text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+}
+@media (hover: hover) { .btn:hover { background: var(--gold-dark); } }
+.btn.ghost { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+@media (hover: hover) { .btn.ghost:hover { background: rgba(255, 255, 255, 0.2); } }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:focus-visible, a:focus-visible, .choice:focus-visible, .hand-choice:focus-visible, .card:focus-visible {
+  outline: 3px solid #fff; outline-offset: 2px;
+}
+.notice {
+  background: rgba(255, 220, 130, 0.18); border: 1px solid rgba(255, 220, 130, 0.5);
+  padding: 8px 12px; border-radius: 10px; margin: 0 0 12px; font-size: 0.95rem;
+}
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.layout .sheet { order: -1; }
+@media (min-width: 900px) {
+  .layout.with-sheet { grid-template-columns: minmax(0, 1fr) 330px; }
+  .layout .sheet { order: 0; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; }
+}
+.panel { background: var(--panel); border-radius: 16px; padding: 16px; }
+
+/* Karten */
+.hand { --cw: clamp(46px, 14.5vw, 74px); display: flex; flex-wrap: wrap; gap: calc(var(--cw) * 0.1); justify-content: center; margin: 10px 0; }
+.hand.mini { --cw: 30px; flex-wrap: nowrap; gap: 3px; justify-content: flex-end; margin: 0; }
+.card {
+  width: var(--cw); height: calc(var(--cw) * 1.4); background: var(--paper);
+  border-radius: calc(var(--cw) * 0.12); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  position: relative; font-weight: 700; font-size: calc(var(--cw) * 0.34); line-height: 1; user-select: none;
+  flex: none; padding: 0; border: 0; font-family: inherit;
+}
+.card.red { color: var(--red); }
+.card.black { color: var(--black); }
+.card .rank { position: absolute; top: 8%; left: 10%; }
+.card .suit { position: absolute; left: 0; right: 0; bottom: 10%; text-align: center; font-size: 1.7em; }
+.card.selected { transform: translateY(-8px); box-shadow: 0 0 0 3px var(--gold), 0 6px 12px rgba(0, 0, 0, 0.4); }
+.card.best { box-shadow: 0 0 0 3px var(--good), 0 2px 6px rgba(0, 0, 0, 0.35); }
+.card.dim { opacity: 0.4; }
+button.card { cursor: pointer; }
+
+/* Startseite */
+.path { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 10px; }
+.unit {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px;
+  background: var(--panel); color: var(--text); text-decoration: none; border: 2px solid transparent;
+}
+.unit .icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.14); font-weight: 700; flex: none; }
+.unit .label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.unit .title { font-weight: 650; }
+a.unit.open { border-color: var(--gold); }
+@media (hover: hover) { a.unit.open:hover, a.unit.passed:hover { background: rgba(0, 0, 0, 0.34); } }
+.unit.passed .icon { background: var(--good); color: #0f3f2c; }
+.unit.locked { opacity: 0.55; }
+.footer-actions { margin-top: 24px; }
+.backup { margin-top: 20px; }
+.backup .actions { justify-content: flex-start; }
+.code-box {
+  display: block; width: 100%; min-height: 6rem; margin: 10px 0 6px; padding: 10px 12px; resize: vertical; word-break: break-all;
+  font: 16px/1.35 ui-monospace, "SF Mono", Menlo, monospace; color: var(--text);
+  background: rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.25); border-radius: 12px;
+}
+.code-box:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Spickzettel */
+.sheet { background: var(--panel); border-radius: 16px; padding: 14px 16px; }
+.sheet[hidden] { display: none; }
+.sheet-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.sheet-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sheet-name { font-size: 0.95rem; }
+
+/* Lektionen und Runden */
+.progress { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; color: var(--muted); font-size: 0.95rem; }
+.progress .bar { flex: 1; height: 8px; background: rgba(255, 255, 255, 0.18); border-radius: 6px; overflow: hidden; }
+.progress .bar > span { display: block; height: 100%; background: var(--gold); }
+.question { font-size: 1.15rem; font-weight: 650; text-align: center; margin: 8px 0; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 14px 0; }
+.choice {
+  appearance: none; border: 2px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.08);
+  color: var(--text); font: inherit; font-weight: 600; border-radius: 12px; min-height: 48px; padding: 10px 12px; cursor: pointer;
+}
+@media (hover: hover) { .choice:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); } }
+.choice.selected { border-color: var(--gold); background: rgba(242, 193, 78, 0.22); }
+.choice.right { border-color: var(--good); background: rgba(127, 214, 154, 0.22); }
+.choice.wrong { border-color: var(--bad); background: rgba(255, 158, 148, 0.2); }
+.choice:disabled { cursor: default; }
+.options-two { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 14px 0; }
+@media (min-width: 760px) { .options-two { grid-template-columns: 1fr 1fr; } }
+.hand-choice {
+  appearance: none; background: rgba(0, 0, 0, 0.2); border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px; padding: 10px 6px; color: var(--text); font: inherit; cursor: pointer;
+}
+@media (hover: hover) { .hand-choice:hover:not(:disabled) { background: rgba(0, 0, 0, 0.34); } }
+.hand-choice:disabled { cursor: default; }
+.hand-choice .label { font-weight: 700; text-align: center; }
+.hand-choice.right { border-color: var(--good); }
+.hand-choice.wrong { border-color: var(--bad); }
+.feedback { margin: 12px 0; padding: 12px 14px; border-radius: 12px; }
+.feedback.good { background: rgba(127, 214, 154, 0.2); border: 1px solid var(--good); }
+.feedback.bad { background: rgba(255, 158, 148, 0.18); border: 1px solid var(--bad); }
+.actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.lesson-title { margin-top: 0; }
+.table-label { text-align: center; font-weight: 650; color: var(--muted); margin: 10px 0 0; }
+.players { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 10px 0; }
+/* Stufe 4: Startkarten-Tabelle, Gruppen, Faustregeln */
+.sheet h3 { margin: 12px 0 4px; font-size: 1rem; }
+.start-grid { border-collapse: collapse; width: 100%; table-layout: fixed; margin: 8px 0; }
+.start-grid td { font-size: 0.5rem; text-align: center; padding: 3px 0; border: 1px solid rgba(0, 0, 0, 0.3); color: #10211a; overflow: hidden; }
+.g-premium { background: #f2c14e; }
+.g-stark { background: #7fd69a; }
+.g-spielbar { background: #8ec5ff; }
+.g-weglegen { background: #4f5f58; }
+.start-grid td.g-weglegen, .group-chip.g-weglegen { color: #e3ebe7; }
+.group-legend { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+.group-chip { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 0.8rem; font-weight: 700; color: #10211a; }
+.rules { margin: 6px 0; padding-left: 18px; font-size: 0.9rem; color: var(--muted); }
+.example-groups { display: grid; gap: 8px; margin: 10px 0; }
+.example-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.seat-strip { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 8px 0; }
+.seat-strip span { background: rgba(0, 0, 0, 0.22); border: 2px solid transparent; border-radius: 10px; padding: 4px 10px; font-size: 0.9rem; }
+.seat-strip span.asked { border-color: var(--gold); font-weight: 700; }
+.info-lines { text-align: center; margin: 6px 0; }
+.grid-detail { margin: 4px 0 8px; font-size: 0.9rem; min-height: 1.4em; }
+.start-grid td { cursor: pointer; }
+/* Handy: der Spickzettel ist ein Blatt über der Seite (am Mac, ab 900 px, steht er daneben) */
+.sheet-close, .only-phone { display: none; }
+@media (max-width: 899px) {
+  .layout .sheet:not([hidden]) {
+    position: fixed; inset: 0; z-index: 30; overflow-y: auto; border-radius: 0; background: var(--felt-dark);
+    padding: 0 max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  /* „Schließen“ als durchgehende Leiste oben: darunter scrollt der Inhalt, auch seitlich nichts sichtbar */
+  .btn.sheet-close {
+    display: flex; position: sticky; top: 0; z-index: 2; width: calc(100% + 32px); margin: 0 -16px 12px; border-radius: 0;
+    padding-top: env(safe-area-inset-top); min-height: calc(48px + env(safe-area-inset-top));
+  }
+  .btn.only-phone { display: inline-flex; }
+  body.sheet-open { overflow: hidden; }
+  .start-grid td { font-size: 0.62rem; }
+}
+
+/* Bot-Tisch */
+.card.back {
+  background: repeating-linear-gradient(45deg, #2b4c7e, #2b4c7e 6px, #35598f 6px, #35598f 12px);
+  border: 3px solid var(--paper);
+}
+.card.slot { background: transparent; border: 2px dashed rgba(255, 255, 255, 0.3); box-shadow: none; }
+.poker-table { background: rgba(0, 0, 0, 0.18); border: 2px solid rgba(255, 255, 255, 0.12); border-radius: 22px; padding: 12px; }
+.opponents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.seat { background: rgba(0, 0, 0, 0.22); border: 2px solid transparent; border-radius: 14px; padding: 8px 6px; text-align: center; min-width: 0; }
+.seat.turn { border-color: var(--gold); box-shadow: 0 0 14px rgba(242, 193, 78, 0.35); }
+.seat.folded { opacity: 0.5; }
+.seat.me .seat-bet:empty, .seat.me .seat-status:empty { display: none; }
+.seat-head { display: flex; justify-content: center; align-items: center; gap: 4px; flex-wrap: wrap; }
+.badge { background: var(--gold); color: #2a2208; border-radius: 999px; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; }
+.seat-stack { font-size: 0.9rem; color: var(--muted); }
+.seat-bet { font-size: 0.85rem; min-height: 1.3em; color: var(--gold); }
+.seat-status { font-size: 0.8rem; min-height: 1.2em; font-weight: 700; }
+.seat .hand { --cw: clamp(30px, 8.5vw, 50px); margin: 4px 0 0; flex-wrap: nowrap; gap: 3px; }
+.seat.me .hand { --cw: clamp(48px, 13vw, 72px); }
+.table-center { text-align: center; margin: 12px 0; }
+.table-center .hand { --cw: clamp(40px, 11vw, 64px); margin: 6px 0; gap: 4px; }
+.street-label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; color: var(--muted); }
+.pot { font-weight: 700; }
+.table-legend { margin: 8px 0 0; text-align: center; }
+.action-bar, .result { margin-top: 12px; }
+.table-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.btn.small { min-height: 34px; padding: 4px 12px; font-size: 0.85rem; }
+.coach-box { background: rgba(242, 193, 78, 0.14); border: 1px solid rgba(242, 193, 78, 0.5); border-radius: 12px; padding: 10px 12px; margin: 10px 0; }
+.coach-box p { margin: 4px 0 0; }
+.raise-panel { margin-top: 10px; }
+.raise-panel input[type="range"] { width: 100%; margin: 10px 0; accent-color: var(--gold); }
+.log { margin-top: 12px; padding: 8px 12px; background: rgba(0, 0, 0, 0.16); border-radius: 12px; font-size: 0.9rem; color: var(--muted); min-height: 3.2em; }
+.player-box { background: rgba(0, 0, 0, 0.2); border-radius: 14px; padding: 8px; }
+.player-box .table-label { margin-top: 0; }
+.hand-choice.selected { border-color: var(--gold); background: rgba(242, 193, 78, 0.16); }
+.card-btn { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 8px; flex: none; }
+.card-btn:disabled { cursor: default; }
+.card-btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.result-big { font-size: 2.2rem; font-weight: 800; text-align: center; margin: 8px 0; }
+
+/* Handy: größere Tippflächen, Aktionsleiste am Tisch bleibt unten sichtbar (am Mac, ab 900 px, ändert sich nichts) */
+@media (max-width: 899px) {
+  .btn.small { min-height: 44px; }
+  .action-bar {
+    position: sticky; bottom: 0; z-index: 10; margin-top: 12px; border-radius: 16px 16px 0 0;
+    background: var(--felt-dark); border-top: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    max-height: 55vh; max-height: 55dvh; overflow-y: auto;
+  }
+  .action-bar .muted { font-size: 0.9rem; }
+  .action-bar .actions { margin-top: 8px; gap: 8px; }
+  .action-bar .actions .btn { flex: 1 1 auto; padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script id="m-cards">
+// Karten, Kartendeck und Zufall. Alle Zufallsfunktionen bekommen rng() übergeben.
+(function (P) {
+  const RANKS = '23456789TJQKA';
+  const SUITS = 'shdc';
+
+  function parseCard(s) {
+    if (typeof s !== 'string' || s.length !== 2) throw new Error('Ungültige Karte: ' + s);
+    const r = RANKS.indexOf(s[0]);
+    if (r < 0 || SUITS.indexOf(s[1]) < 0) throw new Error('Ungültige Karte: ' + s);
+    return { rank: r + 2, suit: s[1] };
+  }
+
+  function parseCards(s) {
+    return s.trim().split(/\s+/).map(parseCard);
+  }
+
+  function cardToString(c) {
+    return RANKS[c.rank - 2] + c.suit;
+  }
+
+  function makeDeck() {
+    const deck = [];
+    for (const suit of SUITS) {
+      for (let rank = 2; rank <= 14; rank++) deck.push({ rank, suit });
+    }
+    return deck;
+  }
+
+  function makeRng(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffle(cards, rng) {
+    const out = cards.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  function pickWeighted(items, weights, rng) {
+    const total = weights.reduce((sum, w) => sum + w, 0);
+    let r = rng() * total;
+    let last = -1;
+    for (let i = 0; i < items.length; i++) {
+      if (weights[i] <= 0) continue;
+      last = i;
+      r -= weights[i];
+      if (r < 0) return items[i];
+    }
+    return items[last];
+  }
+
+  P.cards = { parseCard, parseCards, cardToString, makeDeck, makeRng, shuffle, pickWeighted };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-evaluator">
+// Handbewertung. Kategorien: 0 Hohe Karte, 1 Paar, 2 Zwei Paare, 3 Drilling, 4 Straße,
+// 5 Flush, 6 Full House, 7 Vierling, 8 Straight Flush, 9 Royal Flush.
+(function (P) {
+  function evaluate5(cards) {
+    const ranks = cards.map((c) => c.rank).sort((a, b) => b - a);
+    const flush = cards.every((c) => c.suit === cards[0].suit);
+
+    const counts = new Map();
+    for (const r of ranks) counts.set(r, (counts.get(r) || 0) + 1);
+    const groups = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0]);
+    const shape = groups.map((g) => g[1]).join('');
+    const byGroup = groups.map((g) => g[0]);
+
+    let straightTop = 0;
+    if (counts.size === 5) {
+      if (ranks[0] - ranks[4] === 4) straightTop = ranks[0];
+      else if (ranks.join() === '14,5,4,3,2') straightTop = 5;
+    }
+
+    if (straightTop && flush) {
+      return straightTop === 14
+        ? { category: 9, tiebreak: [14] }
+        : { category: 8, tiebreak: [straightTop] };
+    }
+    if (shape === '41') return { category: 7, tiebreak: byGroup };
+    if (shape === '32') return { category: 6, tiebreak: byGroup };
+    if (flush) return { category: 5, tiebreak: ranks };
+    if (straightTop) return { category: 4, tiebreak: [straightTop] };
+    if (shape === '311') return { category: 3, tiebreak: byGroup };
+    if (shape === '221') return { category: 2, tiebreak: byGroup };
+    if (shape === '2111') return { category: 1, tiebreak: byGroup };
+    return { category: 0, tiebreak: ranks };
+  }
+
+  function compareValues(a, b) {
+    if (a.category !== b.category) return a.category > b.category ? 1 : -1;
+    const n = Math.max(a.tiebreak.length, b.tiebreak.length);
+    for (let i = 0; i < n; i++) {
+      const x = a.tiebreak[i] || 0;
+      const y = b.tiebreak[i] || 0;
+      if (x !== y) return x > y ? 1 : -1;
+    }
+    return 0;
+  }
+
+  // Alle 5er-Teilmengen von 5–7 Karten durchprobieren und die beste nehmen.
+  function bestOf7(cards) {
+    let best = null;
+    const n = cards.length;
+    const pick = [];
+    function walk(start) {
+      if (pick.length === 5) {
+        const five = pick.map((i) => cards[i]);
+        const value = evaluate5(five);
+        if (!best || compareValues(value, best.value) > 0) best = { value, best5: five };
+        return;
+      }
+      for (let i = start; i < n; i++) {
+        pick.push(i);
+        walk(i + 1);
+        pick.pop();
+      }
+    }
+    walk(0);
+    return best;
+  }
+
+  P.evaluator = { evaluate5, bestOf7, compareValues };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-names">
+// Deutsche Namen und Erklärsätze zu Karten und Händen.
+(function (P) {
+  const CATEGORY_NAMES = [
+    { de: 'Hohe Karte', en: 'High Card' },
+    { de: 'Paar', en: 'Pair' },
+    { de: 'Zwei Paare', en: 'Two Pair' },
+    { de: 'Drilling', en: 'Three of a Kind' },
+    { de: 'Straße', en: 'Straight' },
+    { de: 'Flush', en: 'Flush' },
+    { de: 'Full House', en: 'Full House' },
+    { de: 'Vierling', en: 'Four of a Kind' },
+    { de: 'Straight Flush', en: 'Straight Flush' },
+    { de: 'Royal Flush', en: 'Royal Flush' },
+  ];
+  const RANK_PLURAL = ['Zweier', 'Dreier', 'Vierer', 'Fünfer', 'Sechser', 'Siebener', 'Achter', 'Neuner', 'Zehner', 'Buben', 'Damen', 'Könige', 'Asse'];
+  const RANK_SINGLE = ['Zwei', 'Drei', 'Vier', 'Fünf', 'Sechs', 'Sieben', 'Acht', 'Neun', 'Zehn', 'Bube', 'Dame', 'König', 'Ass'];
+  const SUIT_DE = { s: 'Pik', h: 'Herz', d: 'Karo', c: 'Kreuz' };
+
+  function firstMention(category) {
+    const n = CATEGORY_NAMES[category];
+    return n.de === n.en ? n.de : `${n.de} (${n.en})`;
+  }
+
+  function rankNameDe(rank, plural) {
+    return (plural ? RANK_PLURAL : RANK_SINGLE)[rank - 2];
+  }
+
+  function cardNameDe(card) {
+    return `${SUIT_DE[card.suit]} ${rankNameDe(card.rank, false)}`;
+  }
+
+  function describeHandDe(value) {
+    const t = value.tiebreak;
+    const one = (r) => rankNameDe(r, false);
+    const many = (r) => rankNameDe(r, true);
+    switch (value.category) {
+      case 0: return `Hohe Karte ${one(t[0])}`;
+      case 1: return `Paar ${many(t[0])}`;
+      case 2: return `Zwei Paare: ${many(t[0])} und ${many(t[1])}`;
+      case 3: return `Drilling ${many(t[0])}`;
+      case 4: return `Straße bis ${one(t[0])}`;
+      case 5: return `Flush bis ${one(t[0])}`;
+      case 6: return `Full House: ${many(t[0])} voll ${many(t[1])}`;
+      case 7: return `Vierling ${many(t[0])}`;
+      case 8: return `Straight Flush bis ${one(t[0])}`;
+      default: return 'Royal Flush';
+    }
+  }
+
+  function deciderLabel(category, index) {
+    if (category === 2) return index === 1 ? 'das zweite Paar' : 'der Kicker';
+    if (category === 6) return 'das Paar';
+    if (category === 0 || category === 5) return 'die nächsthöhere Karte';
+    return 'der Kicker';
+  }
+
+  function explainComparison(a, b) {
+    const c = P.evaluator.compareValues(a, b);
+    if (c === 0) return 'Gleichstand – der Pot wird geteilt.';
+    const [win, lose] = c > 0 ? [a, b] : [b, a];
+    if (win.category === lose.category) {
+      let i = 0;
+      while (win.tiebreak[i] === lose.tiebreak[i]) i++;
+      if (i > 0) {
+        return `Gleicher Rang – ${deciderLabel(win.category, i)} entscheidet: ` +
+          `${rankNameDe(win.tiebreak[i], false)} schlägt ${rankNameDe(lose.tiebreak[i], false)}.`;
+      }
+    }
+    return `${describeHandDe(win)} schlägt ${describeHandDe(lose)}.`;
+  }
+
+  P.names = { CATEGORY_NAMES, firstMention, rankNameDe, cardNameDe, describeHandDe, explainComparison };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-progress">
+// Fortschritt: Freischaltung der Einheiten, Fehlerstatistik, Speichern im Browser.
+(function (P) {
+  const STORAGE_KEY = 'pokerLernspiel.v1';
+  const VERSION = 1;
+  const UNIT_ORDER = [
+    'stage0', 'stage1-group1', 'stage1-group2', 'stage1-group3', 'stage1-final', 'stage2', 'stage3',
+    'stage4-start', 'stage4-position', 'stage4-outs', 'stage4-odds',
+  ];
+
+  const isObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+  const emptyState = () => ({ version: VERSION, units: {}, categories: {} });
+  const isCount = (x) => Number.isInteger(x) && x >= 0;
+  // Gespeicherter Tisch (Etappe 2): vier Stacks, Button 0–3, Handzahl, Coach an/aus.
+  const isValidTable = (t) => isObject(t) && Array.isArray(t.stacks) && t.stacks.length === 4 && t.stacks.every(isCount) &&
+    Number.isInteger(t.button) && t.button >= 0 && t.button <= 3 && isCount(t.hands) && typeof t.coach === 'boolean';
+
+  // Bereinigte Kopie eines Standes (für Import und Sicherungscode) oder null, wenn er nicht zu uns passt.
+  // Strenger als load(): nur bekannte Einheiten, nur sinnvolle Zähler, nur ein gültiger Tisch.
+  function normalizeState(value) {
+    if (!isObject(value) || value.version !== VERSION || !isObject(value.units) || !isObject(value.categories)) return null;
+    const units = {};
+    for (const id of UNIT_ORDER) {
+      if (isObject(value.units[id]) && value.units[id].passed === true) units[id] = { passed: true };
+    }
+    const categories = {};
+    for (const [key, c] of Object.entries(value.categories)) {
+      if (key === '__proto__') continue;
+      if (isObject(c) && isCount(c.attempts) && isCount(c.misses) && c.misses <= c.attempts) categories[key] = { attempts: c.attempts, misses: c.misses };
+    }
+    const out = { version: VERSION, units, categories };
+    if (isValidTable(value.table)) {
+      out.table = { stacks: value.table.stacks.slice(), button: value.table.button, hands: value.table.hands, coach: value.table.coach };
+    }
+    return out;
+  }
+
+  function createProgressStore(storage) {
+    let persistent = !!storage;
+    let recovered = false; // wahr, wenn gespeicherte Daten da waren, aber nicht lesbar
+
+    function load() {
+      if (!storage) return emptyState();
+      let raw;
+      try {
+        raw = storage.getItem(STORAGE_KEY);
+      } catch (e) {
+        persistent = false;
+        return emptyState();
+      }
+      if (raw === null || raw === undefined) return emptyState();
+      try {
+        const parsed = JSON.parse(raw);
+        if (isObject(parsed) && parsed.version === VERSION && isObject(parsed.units) && isObject(parsed.categories)) {
+          return parsed;
+        }
+      } catch (e) { /* kaputte Daten: leer starten */ }
+      recovered = true;
+      return emptyState();
+    }
+
+    let state = load();
+
+    function save() {
+      if (!storage || !persistent) return;
+      try {
+        storage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        persistent = false;
+      }
+    }
+    // Prüft gleich beim Start, ob Speichern überhaupt geht. Unlesbare Altdaten bleiben bis zur ersten echten Änderung liegen.
+    if (!recovered) save();
+
+    function recordAnswer(categoryKey, correct) {
+      const c = isObject(state.categories[categoryKey]) ? state.categories[categoryKey] : { attempts: 0, misses: 0 };
+      c.attempts = (Number(c.attempts) || 0) + 1;
+      if (!correct) c.misses = (Number(c.misses) || 0) + 1;
+      state.categories[categoryKey] = c;
+      save();
+    }
+
+    function finishRound(unitId, correctCount, total) {
+      const passed = total > 0 && correctCount * 5 >= total * 4; // mindestens 80 %
+      if (passed) {
+        state.units[unitId] = { passed: true };
+        save();
+      }
+      return { passed };
+    }
+
+    function isPassed(unitId) {
+      const u = state.units[unitId];
+      return isObject(u) && u.passed === true;
+    }
+
+    function isUnlocked(unitId) {
+      const i = UNIT_ORDER.indexOf(unitId);
+      if (i < 0) return false;
+      return i === 0 || isPassed(UNIT_ORDER[i - 1]);
+    }
+
+    function weightFor(categoryKey) {
+      const c = state.categories[categoryKey];
+      const attempts = isObject(c) ? Number(c.attempts) || 0 : 0;
+      if (attempts === 0) return 1;
+      return 1 + 3 * ((Number(c.misses) || 0) / attempts);
+    }
+
+    function reset() {
+      state = emptyState();
+      save();
+    }
+
+    // Der Bot-Tisch ist ab bestandener Stufe 2 frei.
+    function isTableUnlocked() {
+      return isPassed('stage2');
+    }
+
+    // Welche Strategie-Themen bestanden sind – der Coach spricht nur diese an.
+    function learnedTopics() {
+      return { start: isPassed('stage4-start'), outs: isPassed('stage4-outs'), odds: isPassed('stage4-odds') };
+    }
+
+    function getTable() {
+      const t = state.table;
+      return isValidTable(t) ? { stacks: t.stacks.slice(), button: t.button, hands: t.hands, coach: t.coach } : null;
+    }
+
+    function saveTable(table) {
+      if (!isValidTable(table)) throw new Error('Ungültiger Tisch');
+      state.table = { stacks: table.stacks.slice(), button: table.button, hands: table.hands, coach: table.coach };
+      save();
+    }
+
+    // Der ganze Stand als Kopie (für den Sicherungscode).
+    function exportState() {
+      return normalizeState(state) || emptyState();
+    }
+
+    // Ersetzt den Stand durch einen geprüften anderen (Sicherungscode einfügen). Ohne Speicher bleibt er im Arbeitsspeicher.
+    function importState(next) {
+      const clean = normalizeState(next);
+      if (!clean) throw new Error('Ungültiger Stand');
+      state = clean;
+      recovered = false;
+      save();
+      return { persistent };
+    }
+
+    return {
+      get persistent() { return persistent; },
+      get recovered() { return recovered; },
+      recordAnswer, finishRound, isPassed, isUnlocked, weightFor, reset, isTableUnlocked, learnedTopics, getTable, saveTable,
+      exportState, importState,
+    };
+  }
+
+  P.progress = { UNIT_ORDER, createProgressStore, normalizeState };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-backup">
+// Sicherungscode: der Fortschritt als Text zum Kopieren und Einfügen (Mac → iPhone, Sicherung für den Notfall).
+// Format: POKER1:<Stand als Base64url>:<Prüfsumme>. Alles hier ist rein und ohne Oberfläche.
+(function (P) {
+  const PREFIX = 'POKER1';
+  const { normalizeState, UNIT_ORDER } = P.progress;
+
+  function toBase64Url(text) {
+    let binary = '';
+    for (const byte of new TextEncoder().encode(text)) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function fromBase64Url(body) {
+    if (body.length % 4 === 1) return null;
+    try {
+      const binary = atob(body.replace(/-/g, '+').replace(/_/g, '/'));
+      return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // FNV-1a mit 32 Bit, als acht kleine Hex-Ziffern: fängt Tippfehler und abgeschnittene Codes ab (kein Schutz gegen Absicht).
+  function checksum(text) {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+  }
+
+  function encodeBackup(state) {
+    const clean = normalizeState(state);
+    if (!clean) throw new Error('Ungültiger Stand');
+    const body = toBase64Url(JSON.stringify(clean));
+    return `${PREFIX}:${body}:${checksum(body)}`;
+  }
+
+  // Gründe: 'leer' (nichts da), 'format' (kein Code dieser Art oder unvollständig), 'prüfsumme' (verändert), 'inhalt' (passt nicht zum Spiel).
+  function decodeBackup(text) {
+    if (typeof text !== 'string') return { ok: false, reason: 'leer' };
+    const spaceless = text.replace(/[\s\u200b]/g, ''); // auch Zeilenumbrüche und geschützte Leerzeichen, die beim Kopieren entstehen
+    if (!spaceless) return { ok: false, reason: 'leer' };
+    // Steht der Code in einer Nachricht („Hier mein Code: POKER1:…“), in Anführungszeichen oder doppelt da, zählt der erste vollständige Code.
+    const found = /POKER1:[A-Za-z0-9_-]+:[0-9a-f]{8}/i.exec(spaceless);
+    const clean = found ? found[0] : spaceless;
+    const parts = clean.split(':');
+    // Vorsatz und Prüfsumme dürfen groß oder klein geschrieben sein: Handy-Tastaturen ändern den Anfang einer Eingabe gern.
+    if (parts.length !== 3 || parts[0].toUpperCase() !== PREFIX || !/^[A-Za-z0-9_-]+$/.test(parts[1]) || !/^[0-9a-f]{8}$/i.test(parts[2])) {
+      return { ok: false, reason: 'format' };
+    }
+    if (checksum(parts[1]) !== parts[2].toLowerCase()) return { ok: false, reason: 'prüfsumme' };
+    const json = fromBase64Url(parts[1]);
+    let parsed;
+    try {
+      parsed = json === null ? undefined : JSON.parse(json);
+    } catch (e) {
+      parsed = undefined;
+    }
+    if (parsed === undefined) return { ok: false, reason: 'format' };
+    const state = normalizeState(parsed);
+    return state ? { ok: true, state } : { ok: false, reason: 'inhalt' };
+  }
+
+  // Ein kurzer Satz je Teil, damit man vor dem Ersetzen sieht, was im Code steckt.
+  function describeBackup(state) {
+    const passed = UNIT_ORDER.filter((id) => state.units && state.units[id] && state.units[id].passed === true).length;
+    const head = `${passed} von ${UNIT_ORDER.length} Einheiten bestanden.`;
+    const table = state.table;
+    if (!table || !table.hands) return `${head} Noch kein Tisch gespielt.`;
+    return `${head} Tisch: ${table.hands} ${table.hands === 1 ? 'Hand' : 'Hände'} gespielt, du hast ${table.stacks[0]} Chips.`;
+  }
+
+  P.backup = { PREFIX, encodeBackup, decodeBackup, describeBackup, checksum };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-exercises">
+// Aufgaben-Generatoren. Jede Funktion bekommt rng() übergeben und liefert reine Daten.
+(function (P) {
+  const { shuffle, makeDeck, pickWeighted } = P.cards;
+  const { evaluate5, compareValues, bestOf7 } = P.evaluator;
+
+  const SUITS = ['s', 'h', 'd', 'c'];
+  const ALL_RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
+  const randInt = (rng, n) => Math.floor(rng() * n);
+  const randSuit = (rng) => SUITS[randInt(rng, 4)];
+  const sample = (rng, items, n) => shuffle(items, rng).slice(0, n);
+  const card = (rank, suit) => ({ rank, suit });
+  const single = (rng) => (rank) => card(rank, randSuit(rng));
+  // n Karten desselben Rangs in n verschiedenen Farben
+  const group = (rng, rank, n) => sample(rng, SUITS, n).map((s) => card(rank, s));
+  // fünf aufeinanderfolgende Ränge mit oberster Karte top (top 5 = Wheel A-2-3-4-5)
+  const run = (top) => (top === 5 ? [5, 4, 3, 2, 14] : [top, top - 1, top - 2, top - 3, top - 4]);
+
+  // Ein Baumeister je Kategorie. Der Zufall kann eine höhere Kategorie erzeugen
+  // (z. B. Farbe bei der Straße); build() prüft deshalb mit evaluate5 nach.
+  const BUILDERS = [
+    (rng) => sample(rng, ALL_RANKS, 5).map(single(rng)),
+    (rng) => { const [p, ...rest] = sample(rng, ALL_RANKS, 4); return [...group(rng, p, 2), ...rest.map(single(rng))]; },
+    (rng) => { const [p, q, k] = sample(rng, ALL_RANKS, 3); return [...group(rng, p, 2), ...group(rng, q, 2), card(k, randSuit(rng))]; },
+    (rng) => { const [t, ...rest] = sample(rng, ALL_RANKS, 3); return [...group(rng, t, 3), ...rest.map(single(rng))]; },
+    (rng) => run(5 + randInt(rng, 10)).map(single(rng)),
+    (rng) => { const s = randSuit(rng); return sample(rng, ALL_RANKS, 5).map((r) => card(r, s)); },
+    (rng) => { const [t, p] = sample(rng, ALL_RANKS, 2); return [...group(rng, t, 3), ...group(rng, p, 2)]; },
+    (rng) => { const [q, k] = sample(rng, ALL_RANKS, 2); return [...group(rng, q, 4), card(k, randSuit(rng))]; },
+    (rng) => { const s = randSuit(rng); return run(5 + randInt(rng, 9)).map((r) => card(r, s)); },
+    (rng) => { const s = randSuit(rng); return [14, 13, 12, 11, 10].map((r) => card(r, s)); },
+  ];
+
+  function build(rng, category) {
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const cards = BUILDERS[category](rng);
+      if (evaluate5(cards).category === category) return shuffle(cards, rng);
+    }
+    throw new Error('Konnte keine Hand der Kategorie ' + category + ' bauen');
+  }
+
+  const key = (c) => c.rank + c.suit;
+
+  function makeIdentify(rng, category) {
+    return { cards: build(rng, category), category };
+  }
+
+  function makeStronger(rng, categoryPool) {
+    const pool = [...new Set(categoryPool)];
+    if (pool.length < 2) throw new Error('Der Pool braucht mindestens zwei verschiedene Kategorien');
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const [ca, cb] = sample(rng, pool, 2);
+      const a = build(rng, ca);
+      const b = build(rng, cb);
+      const used = new Set(a.map(key));
+      if (b.some((c) => used.has(key(c)))) continue; // keine Karte doppelt
+      return { a, b, winner: compareValues(evaluate5(a), evaluate5(b)) > 0 ? 'a' : 'b' };
+    }
+    throw new Error('Konnte kein Handpaar bauen');
+  }
+
+  // Zieht neu, bis sich die Aufgabe vom Vorgänger unterscheidet (höchstens 10 Versuche).
+  function nextDistinct(make, previous) {
+    const prev = previous === null || previous === undefined ? null : JSON.stringify(previous);
+    let ex = make();
+    for (let tries = 1; prev !== null && JSON.stringify(ex) === prev && tries < 10; tries++) ex = make();
+    return ex;
+  }
+
+  // --- Stufe 2: beste fünf aus sieben ---
+
+  // Wheel-Aufgabe: A-2-3-4-5 in gemischten Farben plus zwei Zufallskarten, bunt auf Hand und Tisch verteilt.
+  function dealWheel(rng) {
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const wheel = [14, 2, 3, 4, 5].map((r) => card(r, randSuit(rng)));
+      const used = new Set(wheel.map(key));
+      const extras = shuffle(makeDeck().filter((c) => !used.has(key(c))), rng).slice(0, 2);
+      const cards = shuffle([...wheel, ...extras], rng);
+      const best = bestOf7(cards).value;
+      if (best.category === 4 && best.tiebreak[0] === 5) return { cards, best }; // keine 6 dabei, kein Flush
+    }
+    return null;
+  }
+
+  function makeBest5(rng) {
+    if (rng() < 0.1) {
+      const w = dealWheel(rng);
+      if (w) return { hole: w.cards.slice(0, 2), board: w.cards.slice(2), seven: w.cards, best: w.best };
+    }
+    let cards;
+    let best;
+    for (let attempt = 0; attempt < 50; attempt++) {
+      cards = shuffle(makeDeck(), rng).slice(0, 7);
+      best = bestOf7(cards).value;
+      if (!(best.category === 0 && rng() < 0.7)) break; // Hände ohne Paar meistens neu mischen
+    }
+    return { hole: cards.slice(0, 2), board: cards.slice(2), seven: cards, best };
+  }
+
+  // picked: genau fünf verschiedene Indizes in ex.seven. Richtig ist jede Auswahl mit dem besten Wert.
+  function checkBest5(ex, picked) {
+    const valid = Array.isArray(picked) && picked.length === 5 && new Set(picked).size === 5 &&
+      picked.every((i) => Number.isInteger(i) && i >= 0 && i < ex.seven.length);
+    if (!valid) throw new Error('Es müssen genau fünf verschiedene Karten gewählt werden');
+    const value = evaluate5(picked.map((i) => ex.seven[i]));
+    return { correct: compareValues(value, ex.best) === 0, picked: value, best: ex.best };
+  }
+
+  // --- Stufe 3: wer gewinnt? ---
+
+  function tableResult(board, hands) {
+    const values = hands.map((h) => bestOf7([...h, ...board]).value);
+    let top = values[0];
+    for (const v of values) if (compareValues(v, top) > 0) top = v;
+    const winners = [];
+    values.forEach((v, i) => { if (compareValues(v, top) === 0) winners.push(i); });
+    return { values, winners };
+  }
+
+  function dealRandom(rng, playerCount) {
+    const cards = shuffle(makeDeck(), rng);
+    return {
+      board: cards.slice(0, 5),
+      hands: Array.from({ length: playerCount }, (_, p) => cards.slice(5 + 2 * p, 7 + 2 * p)),
+    };
+  }
+
+  // Spieler 2 bekommt dieselben Ränge wie Spieler 1, nur in anderen Farben.
+  function dealTwin(rng, playerCount) {
+    const table = dealRandom(rng, playerCount);
+    const taken = new Set([...table.board, ...table.hands.flat()].map(key));
+    const twin = [];
+    for (const c of table.hands[0]) {
+      const options = SUITS.filter((s) => !taken.has(c.rank + s));
+      if (options.length === 0) return null;
+      const suit = options[randInt(rng, options.length)];
+      taken.add(c.rank + suit);
+      twin.push(card(c.rank, suit));
+    }
+    table.hands[1] = twin;
+    return table;
+  }
+
+  // Starkes Board (Straße, Flush oder Full House), das die Hände nicht verbessern.
+  // Kein Straight Flush: zu selten und für Anfänger verwirrend.
+  function dealBoardPlays(rng, playerCount) {
+    const board = build(rng, [4, 4, 5, 5, 6][randInt(rng, 5)]);
+    const used = new Set(board.map(key));
+    const rest = shuffle(makeDeck().filter((c) => !used.has(key(c))), rng);
+    return { board, hands: Array.from({ length: playerCount }, (_, p) => rest.slice(2 * p, 2 * p + 2)) };
+  }
+
+  function makeWinner(rng, playerCount) {
+    if (playerCount !== 2 && playerCount !== 3) throw new Error('Die Spielerzahl muss 2 oder 3 sein');
+    const roll = rng();
+    const mode = roll < 0.1 ? 'twin' : roll < 0.2 ? 'boardPlays' : 'random';
+    let table = null;
+    for (let attempt = 0; attempt < 200 && !table; attempt++) {
+      const t = mode === 'twin' ? dealTwin(rng, playerCount)
+        : mode === 'boardPlays' ? dealBoardPlays(rng, playerCount)
+          : dealRandom(rng, playerCount);
+      if (!t) continue;
+      const r = tableResult(t.board, t.hands);
+      if (mode === 'twin' && compareValues(r.values[0], r.values[1]) !== 0) continue;
+      if (mode === 'boardPlays' && r.winners.length !== playerCount) continue;
+      table = t;
+    }
+    if (!table) table = dealRandom(rng, playerCount);
+    const hands = shuffle(table.hands, rng); // gleiche Hände nicht immer auf denselben Plätzen
+    const { values, winners } = tableResult(table.board, hands);
+    return { board: table.board, hands, values, winners };
+  }
+
+  // --- Stufe 4: Startkarten und Position (m-analysis steht später in der Datei, P.analysis wird erst beim Aufruf gelesen) ---
+
+  const RANK_OF_CHAR = { A: 14, K: 13, Q: 12, J: 11, T: 10, 9: 9, 8: 8, 7: 7, 6: 6, 5: 5, 4: 4, 3: 3, 2: 2 };
+  const nonZero = (weights) => (weights.some((w) => w > 0) ? weights : weights.map(() => 1));
+
+  // Eine Starthand mit Position und Erhöhungs-Zustand; die Gruppe wird gewichtet, die Hand gleichmäßig daraus gezogen.
+  function makeStartHand(rng, weightOf = () => 1) {
+    const analysis = P.analysis;
+    const g = pickWeighted(analysis.GROUPS, nonZero(analysis.GROUPS.map((x) => weightOf('start-' + x))), rng);
+    const pool = analysis.startHandGrid().flat().filter((cell) => cell.group === g);
+    const cell = pool[randInt(rng, pool.length)];
+    const [s1, s2] = sample(rng, SUITS, 2);
+    const suited = cell.label[2] === 's';
+    const hole = shuffle([card(RANK_OF_CHAR[cell.label[0]], s1), card(RANK_OF_CHAR[cell.label[1]], suited ? s1 : s2)], rng);
+    const onButton = rng() < 0.5;
+    const facingRaise = rng() < 0.5;
+    const play = analysis.shouldPlayStartHand(hole, { onButton, facingRaise });
+    return { hole, onButton, facingRaise, group: cell.group, answer: play ? 'spielen' : 'weglegen' };
+  }
+
+  // Wer handelt nach dem Flop zuletzt/zuerst, und ist ein Sitz früh oder spät? (4 Sitze, Spät = nur der Button)
+  function makePositionTask(rng, weightOf = () => 1) {
+    const kinds = ['last', 'first', 'class'];
+    const kind = pickWeighted(kinds, nonZero(kinds.map((k) => weightOf('position-' + k))), rng);
+    const button = randInt(rng, 4);
+    if (kind === 'last') return { kind, button, answer: button };
+    if (kind === 'first') return { kind, button, answer: (button + 1) % 4 };
+    const seat = rng() < 0.5 ? button : (button + 1 + randInt(rng, 3)) % 4;
+    return { kind, button, seat, answer: seat === button ? 'spät' : 'früh' };
+  }
+
+  function explainPosition(task) {
+    if (task.kind === 'last') return 'Der Button handelt nach dem Flop als Letzter.';
+    if (task.kind === 'first') return 'Nach dem Flop beginnt der Spieler links vom Button.';
+    return 'Nur der Button ist spät – er handelt nach dem Flop zuletzt.';
+  }
+
+  // --- Stufe 4: Outs, Chance und Pot Odds ---
+
+  const OUT_DISTRACTORS = [2, 4, 6, 8, 9, 12, 15];
+
+  // „eine Fünf“, „ein Bube“ – im Nominativ und im Dativ („einer Fünf“, „einem Buben“)
+  function rankPhrase(rank, dative) {
+    const name = P.names.rankNameDe(rank, false);
+    if (rank === 11) return dative ? 'einem Buben' : 'ein Bube';
+    if (rank === 13 || rank === 14) return `${dative ? 'einem' : 'ein'} ${name}`;
+    return `${dative ? 'einer' : 'eine'} ${name}`;
+  }
+
+  // Hand + Flop oder Turn mit genau einem reinen Draw; gefragt wird nach der Zahl der Outs.
+  function makeOutsTask(rng, weightOf = () => 1) {
+    const analysis = P.analysis;
+    const kinds = ['flush', 'open', 'gutshot'];
+    const drawKind = pickWeighted(kinds, nonZero(kinds.map((k) => weightOf('outs-' + k))), rng);
+    for (let attempt = 0; attempt < 20000; attempt++) {
+      const cards = shuffle(makeDeck(), rng);
+      const boardLength = 3 + randInt(rng, 2);
+      const hole = cards.slice(0, 2);
+      const board = cards.slice(2, 2 + boardLength);
+      const d = analysis.pureDraw(hole, board);
+      if (!d) continue;
+      const kind = d.kind === 'flush' ? 'flush' : d.ranks.length >= 2 ? 'open' : 'gutshot';
+      if (kind !== drawKind) continue;
+      const others = shuffle(OUT_DISTRACTORS.filter((n) => n !== d.outs), rng).slice(0, 3);
+      const task = { hole, board, outs: d.outs, drawKind, options: [...others, d.outs].sort((a, b) => a - b) };
+      if (d.ranks) task.ranks = d.ranks;
+      return task;
+    }
+    throw new Error('Konnte keine Outs-Aufgabe bauen');
+  }
+
+  function explainOuts(task) {
+    if (task.drawKind === 'flush') return `${task.outs} Outs: Von den 13 Karten dieser Farbe sind vier zu sehen, neun fehlen noch.`;
+    if (task.drawKind === 'open') return `${task.outs} Outs: Mit ${task.ranks.map((r) => rankPhrase(r, true)).join(' oder ')} hast du die Straße – je vier Karten.`;
+    return `${task.outs} Outs: Nur ${rankPhrase(task.ranks[0], false)} macht die Straße – vier Karten.`;
+  }
+
+  // kind 'chance': Wie groß ist die Chance (Faustregel)? kind 'call': Lohnt sich der Call? (Pot inklusive Einsatz,
+  // mindestens 8 Prozentpunkte Abstand zwischen Chance und Preis, damit die Antwort eindeutig ist)
+  function makeOddsTask(rng, kind) {
+    const analysis = P.analysis;
+    if (kind === 'chance') {
+      const outs = [4, 8, 9, 12][randInt(rng, 4)];
+      const boardLength = 3 + randInt(rng, 2);
+      const answer = analysis.chanceByRule(outs, boardLength);
+      const candidates = [outs * (boardLength === 3 ? 2 : 4), outs * 3, outs * 5, outs, outs * 6]; // zuerst die falsche Straße
+      const wrong = [...new Set(candidates)].filter((v) => v !== answer).slice(0, 3);
+      return { kind, outs, boardLength, answer, options: [...wrong, answer].sort((a, b) => a - b) };
+    }
+    const want = rng() < 0.5 ? 'call' : 'fold';
+    for (let attempt = 0; attempt < 5000; attempt++) {
+      const outs = [4, 8, 9][randInt(rng, 3)];
+      const boardLength = 3 + randInt(rng, 2);
+      const pot = 10 * (6 + randInt(rng, 35));
+      const toCall = 10 * (1 + randInt(rng, pot / 10));
+      const chance = analysis.chanceByRule(outs, boardLength);
+      const price = analysis.callPrice(pot, toCall);
+      if (Math.abs(chance - price) < 8) continue;
+      const answer = chance >= price ? 'call' : 'fold';
+      if (answer !== want) continue;
+      return { kind: 'call', outs, boardLength, pot, toCall, chance, price, answer };
+    }
+    throw new Error('Konnte keine Odds-Aufgabe bauen');
+  }
+
+  function explainOdds(task) {
+    const analysis = P.analysis;
+    const flop = task.boardLength === 3;
+    const mult = flop ? 4 : 2;
+    const chance = analysis.chanceByRule(task.outs, task.boardLength);
+    if (task.kind === 'chance') return `Nach dem ${flop ? 'Flop' : 'Turn'} zählt jedes Out etwa ${mult} %: ${task.outs} × ${mult} = ${chance} %.`;
+    const price = analysis.callPrice(task.pot, task.toCall);
+    return `Du zahlst ${task.toCall}, um ${task.pot + task.toCall} zu gewinnen: du brauchst etwa ${price} %. ` +
+      `Deine Chance: ${task.outs} × ${mult} = ${chance} %. ${chance >= price ? 'Das reicht – Call.' : 'Das reicht nicht – Fold.'}`;
+  }
+
+  P.exercises = {
+    makeIdentify, makeStronger, nextDistinct, makeBest5, checkBest5, makeWinner,
+    makeStartHand, makePositionTask, explainPosition, makeOutsTask, explainOuts, makeOddsTask, explainOdds,
+  };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-content">
+// Alle Lerntexte (Deutsch) als Daten. Eine Erklärkarte hat höchstens 50 Wörter.
+(function (P) {
+  const stage0Steps = [
+    {
+      id: 'goal',
+      title: 'Worum geht es?',
+      text: 'Beim Texas Hold\'em spielt ihr um Chips in der Mitte, den Pot. Du gewinnst ihn, wenn alle anderen aufgeben oder du am Ende die beste Hand hast – aus genau fünf Karten. Wir spielen gleich eine Runde mit Anna, Ben und Clara durch.',
+    },
+    {
+      id: 'blinds',
+      title: 'Blinds und Button',
+      text: 'Anna ist der Button (ein Markierungsstein) und teilt aus. Die zwei Spieler links von ihr setzen Pflichteinsätze, die Blinds: Ben den kleinen (10 Chips), Clara den großen (20). So liegt schon etwas im Pot. Nach jeder Runde wandert der Button einen Platz weiter.',
+    },
+    {
+      id: 'preflop',
+      title: 'Preflop: deine zwei Karten',
+      text: 'Jeder bekommt zwei Karten verdeckt, die nur er sehen darf. Danach folgt die erste Setzrunde, Preflop genannt (vor dem Flop – dazu gleich mehr). Anna geht mit (20 Chips), Ben legt 10 dazu, Clara schiebt, weil sie schon 20 gesetzt hat.',
+    },
+    {
+      id: 'flop',
+      title: 'Flop: drei Tischkarten',
+      text: 'Jetzt werden drei Karten offen in die Tischmitte gelegt, der Flop. Diese Gemeinschaftskarten gehören allen Spielern. Dann wird wieder gesetzt: Ben und Clara schieben, Anna setzt 20, beide gehen mit. Im Pot liegen jetzt 120 Chips.',
+      example: 'Ks 7d 2c',
+    },
+    {
+      id: 'turn',
+      title: 'Turn: die vierte Karte',
+      text: 'Eine vierte Gemeinschaftskarte kommt offen dazu, der Turn. Diesmal schieben alle drei, im Pot bleiben 120 Chips.',
+      example: 'Ks 7d 2c Qh',
+    },
+    {
+      id: 'river',
+      title: 'River: die fünfte Karte',
+      text: 'Die fünfte und letzte Gemeinschaftskarte heißt River. Ben setzt 40, Anna und Clara gehen mit. Jetzt liegen 240 Chips im Pot, und alle drei sind noch dabei.',
+      example: 'Ks 7d 2c Qh 7s',
+    },
+    {
+      id: 'actions',
+      title: 'Was du tun kannst',
+      text: 'Check heißt schieben: nichts setzen, wenn vor dir niemand gesetzt hat. Setzt jemand als Erster, heißt das Bet. Call heißt mitgehen: den Einsatz bezahlen. Raise heißt erhöhen. Fold heißt aufgeben: Karten weglegen; schon gesetzte Chips bleiben im Pot.',
+    },
+    {
+      id: 'showdown',
+      title: 'Showdown: wer gewinnt?',
+      text: 'Sind nach der letzten Setzrunde noch mehrere Spieler dabei, decken alle auf: der Showdown. Jeder bildet aus seinen zwei und den fünf Tischkarten die beste Hand aus fünf Karten. Hier gewinnt Ben mit drei Siebenern gegen die Zwei Paare von Anna und Clara.',
+      example: 'Ks 7d 2c Qh 7s',
+      extra: [
+        { label: 'Anna', cards: 'Ah Kh' },
+        { label: 'Ben', cards: '7h 3c' },
+        { label: 'Clara', cards: 'Qd 9d' },
+      ],
+      winner: 'Ben',
+    },
+  ];
+
+  const stage0Quiz = [
+    { question: 'Wie viele Karten bekommt jeder Spieler verdeckt?', options: ['Eine', 'Zwei', 'Fünf'], correct: 1 },
+    { question: 'Wie viele Gemeinschaftskarten liegen am Ende auf dem Tisch?', options: ['Drei', 'Vier', 'Fünf'], correct: 2 },
+    { question: 'Wie heißt die vierte Gemeinschaftskarte?', options: ['Turn', 'Flop', 'River'], correct: 0 },
+    { question: 'Vor dir hat niemand gesetzt und du willst nichts setzen. Was sagst du?', options: ['Fold', 'Check', 'Raise'], correct: 1 },
+    {
+      question: 'Woraus besteht deine Hand im Showdown?',
+      options: ['Nur aus deinen zwei Karten', 'Immer aus allen fünf Tischkarten', 'Aus den besten fünf von sieben Karten'],
+      correct: 2,
+    },
+  ];
+
+  // Index = Kategorie. Der Text nennt den Rang beim ersten Auftauchen mit firstMention().
+  const rankLessons = [
+    { category: 0, example: 'Ah Jd 9c 6s 3h', text: 'Hohe Karte (High Card): Du hast keine der anderen Kombinationen. Dann zählt zuerst deine höchste Karte, hier das Ass; bei Gleichstand die nächsthöhere. Das ist die schwächste Hand.' },
+    { category: 1, example: 'Kh Kd 9c 6s 3h', text: 'Paar (Pair): Zwei Karten mit gleichem Rang, hier zwei Könige. Die drei anderen Karten spielen nur bei Gleichstand eine Rolle.' },
+    { category: 2, example: 'Kh Kd 7c 7s 2h', text: 'Zwei Paare (Two Pair): Zwei verschiedene Paare, hier Könige und Siebener, plus eine fünfte Karte. Das höhere Paar zählt zuerst.' },
+    { category: 3, example: 'Qh Qd Qc 7s 2h', text: 'Drilling (Three of a Kind): Drei Karten mit gleichem Rang, hier drei Damen. Die zwei übrigen Karten passen zu nichts.' },
+    { category: 4, example: '9h 8d 7c 6s 5h', text: 'Straße (Straight): Fünf Karten in lückenloser Reihenfolge, die Farben sind egal, hier Neun bis Fünf. Das Ass zählt oben (Zehn bis Ass) oder unten (Ass bis Fünf).' },
+    { category: 5, example: 'Ah Jh 9h 6h 3h', text: 'Flush: Fünf Karten derselben Farbe, die Reihenfolge ist egal, hier fünf Herzen. Bei zwei Flushes zählt die höchste Karte, bei Gleichstand die nächste.' },
+    { category: 6, example: 'Kh Kd Kc 7s 7h', text: 'Full House: Ein Drilling plus ein Paar, hier drei Könige und zwei Siebener. Man sagt: Könige voll Siebener.' },
+    { category: 7, example: '7h 7d 7c 7s Kh', text: 'Vierling (Four of a Kind): Vier Karten mit gleichem Rang, hier alle vier Siebener, plus eine beliebige fünfte Karte. Sehr selten und sehr stark.' },
+    { category: 8, example: '9h 8h 7h 6h 5h', text: 'Straight Flush: Eine Straße in nur einer Farbe, hier Neun bis Fünf in Herz. Er schlägt jede andere Handart; nur ein höherer Straight Flush oder der Royal Flush ist besser.' },
+    { category: 9, example: 'Ah Kh Qh Jh Th', text: 'Royal Flush: Der höchste Straight Flush, Zehn bis Ass in einer Farbe. Die beste Hand im Poker – du wirst sie fast nie sehen.' },
+  ];
+
+  const groups = [
+    { id: 'stage1-group1', categories: [0, 1, 2] },
+    { id: 'stage1-group2', categories: [3, 4, 5] },
+    { id: 'stage1-group3', categories: [6, 7, 8, 9] },
+  ];
+
+  const stage23Intro = {
+    stage2: 'Du hast zwei eigene Karten und fünf auf dem Tisch. Wähle daraus die besten fünf – auch alle fünf vom Tisch sind erlaubt. Haben zwei Hände dasselbe Paar, entscheidet die höchste Beikarte, der Kicker.',
+    stage3: 'Zwei oder drei Spieler decken auf. Wer hat die beste Hand? Sind zwei Hände gleich stark, gibt es einen Gleichstand: Der Pot wird geteilt. Tippe dann alle Gewinner an.',
+  };
+
+  const unitTitles = {
+    'stage0': 'So läuft eine Runde',
+    'stage1-group1': 'Handränge 1: Hohe Karte, Paar, Zwei Paare',
+    'stage1-group2': 'Handränge 2: Drilling, Straße, Flush',
+    'stage1-group3': 'Handränge 3: Full House bis Royal Flush',
+    'stage1-final': 'Alle Handränge im Überblick',
+    'stage2': 'Die beste Hand aus sieben Karten',
+    'stage3': 'Wer gewinnt?',
+    'stage4-start': 'Startkarten: spielen oder weglegen',
+    'stage4-position': 'Position am Tisch',
+    'stage4-outs': 'Outs zählen',
+    'stage4-odds': 'Chance und Pot Odds',
+  };
+
+  // Stufe 4 „Besser spielen“. Zahlen und Gruppen müssen zu `Poker.analysis` passen (die Tests prüfen das):
+  // `startExamples` je Gruppe, `example`/`board` bei den Outs-Karten, die Preis- und Chance-Beispiele.
+  const stage4 = {
+    lessons: {
+      'stage4-start': [
+        { id: 'merkhilfe', title: 'Welche Hände lohnen sich?', text: 'Nicht jede Hand lohnt sich. Das macht eine Hand stärker: Paare, hohe Karten, gleiche Farbe und Karten, die nah beieinander liegen. Eine Tabelle im Spickzettel zeigt dir alle Hände auf einen Blick.' },
+        { id: 'gruppen', title: 'Vier Gruppen', text: 'Premium sind die stärksten Hände. Stark ist gut, reicht aber gegen eine Erhöhung nicht. Spielbar lohnt sich nur am Button. Weglegen heißt: fast nie spielen. Unten stehen Beispiele für jede Gruppe.', groups: ['premium', 'stark', 'spielbar', 'weglegen'] },
+        { id: 'regel', title: 'Ab welcher Gruppe spielst du?', text: 'Am Button, wenn noch niemand erhöht hat: ab Spielbar. Nicht am Button, wenn noch niemand erhöht hat: ab Stark. Hat jemand vor dir erhöht: nur mit Premium. Sonst legst du die Hand weg.' },
+        { id: 'tabelle', title: 'Die Tabelle im Spickzettel', text: 'Paare stehen auf der Diagonale, Hände in gleicher Farbe darüber, verschiedene Farben darunter. Die Farbe eines Feldes verrät seine Gruppe. So findest du auch Hände, die hier nicht als Beispiel stehen.' },
+      ],
+      'stage4-position': [
+        { id: 'zuletzt', title: 'Wer handelt zuletzt?', text: 'Nach dem Flop beginnt der Spieler links vom Button. Der Button handelt als Letzter. Er sieht, was alle anderen getan haben, bevor er entscheidet.' },
+        { id: 'frueh-spaet', title: 'Früh und spät', text: 'Spät ist nur der Button. Alle anderen Plätze sind früh. Das gilt für unseren Tisch mit vier Spielern. Bei größeren Runden gelten auch die Plätze rechts vom Button als spät.' },
+        { id: 'warum', title: 'Warum Position hilft', text: 'Wer später handelt, weiß mehr. Darum darfst du am Button mehr Hände spielen als auf den anderen Plätzen. Das steckt schon in der Regel „Ab welcher Gruppe spielst du?“.' },
+      ],
+      'stage4-outs': [
+        { id: 'out', title: 'Was ist ein Out?', text: 'Ein Out ist eine Karte, die dir noch zur besseren Hand fehlt. Ein „Draw“ ist eine noch unfertige Hand: dir fehlt eine Karte zur Straße oder zum Flush. Die Outs zählst du aus den Karten, die du noch nicht siehst.' },
+        { id: 'flush', title: 'Flush-Draw', text: 'Vier Karten einer Farbe, die fünfte fehlt. Von den 13 Karten dieser Farbe siehst du vier, neun fehlen noch. Das sind 9 Outs.', example: 'Ah Kh', board: '2h 7h 9c' },
+        { id: 'offen', title: 'Offener Straßen-Draw', text: 'Vier Karten in einer Reihe, und an beiden Enden kann eine Karte die Straße machen. Zwei Ränge mit je vier Karten sind 8 Outs.', example: '9h 8d', board: '7c 6s 2h' },
+        { id: 'gutshot', title: 'Gutshot', text: 'Dir fehlt nur eine Karte in der Mitte der Reihe. Ein Rang mit vier Karten sind 4 Outs.', example: 'Ah 5d', board: '2c 3s 9h' },
+      ],
+      'stage4-odds': [
+        { id: 'faustregel', title: 'Aus Outs wird eine Chance', text: 'Nach dem Flop kommen noch zwei Karten: Outs × 4 ergibt die Chance in Prozent. Nach dem Turn kommt nur noch eine: Outs × 2. Mit 9 Outs hast du nach dem Flop etwa 36 %.' },
+        { id: 'preis', title: 'Was kostet der Call?', text: 'Der Preis ist dein Call geteilt durch den Pot plus deinen Call, in Prozent – die sogenannten „Pot Odds“. Der Pot enthält den Einsatz deines Gegners schon (inklusive). Im Pot liegen 150, du zahlst 50: 50 von 200 sind 25 %.' },
+        { id: 'lohnt', title: 'Lohnt sich der Call?', text: 'Ein Call lohnt sich, wenn deine Chance mindestens so groß ist wie der Preis. 9 Outs nach dem Flop sind etwa 36 %, der Preis war 25 %: Call. Mit 4 Outs hättest du nur 16 %: Fold.' },
+        { id: 'grob', title: 'Nur eine Faustregel', text: 'Das ist eine grobe Rechnung und gilt, wenn dir nur noch eine Straße oder ein Flush fehlt. Sie ersetzt kein Gefühl für das Spiel, aber sie schützt dich vor teuren Calls mit kleinen Chancen.' },
+      ],
+    },
+    // Abschnitt „Faustregeln“ im Spickzettel (dieselben Zahlen wie Lektionen, Aufgaben und Coach)
+    cheatSheet: [
+      'Spielen ab: Button ohne Erhöhung Spielbar · nicht am Button ohne Erhöhung Stark · nach einer Erhöhung Premium.',
+      'Outs: Flush-Draw 9, offene Straße 8, Gutshot 4.',
+      'Chance: nach dem Flop Outs × 4 %, nach dem Turn Outs × 2 %.',
+      'Preis: Call ÷ (Pot + Call), der Pot inklusive Einsatz des Gegners.',
+      'Ein Call lohnt sich, wenn die Chance mindestens so groß ist wie der Preis.',
+    ],
+    startExamples: {
+      premium: ['As Ad', 'Ks Kd', 'Qs Qd', 'As Ks', 'As Qs'],
+      stark: ['Ts Td', '9s 9d', 'As Kd', 'As Js', 'Ks Qs'],
+      spielbar: ['8s 8d', '6s 6d', 'As Jd', 'Ks Qd', '9s 8s'],
+      weglegen: ['7s 2d', 'Ks 3d', '2s 2d', '4s 4d', '9s 3d'],
+    },
+  };
+
+  P.content = { stage0Steps, stage0Quiz, rankLessons, groups, stage23Intro, unitTitles, stage4 };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-analysis">
+// Einschätzung von Starthänden und Händen mit Board – für die Bots und den Coach.
+(function (P) {
+  const { bestOf7 } = P.evaluator;
+
+  // Chen-Formel für Starthände, auf eine ganze Zahl aufgerundet.
+  function chenScore(hole) {
+    const [a, b] = hole[0].rank >= hole[1].rank ? [hole[0], hole[1]] : [hole[1], hole[0]];
+    const points = (rank) => (rank === 14 ? 10 : rank === 13 ? 8 : rank === 12 ? 7 : rank === 11 ? 6 : rank / 2);
+    let score = points(a.rank);
+    if (a.rank === b.rank) return Math.ceil(Math.max(5, score * 2));
+    if (a.suit === b.suit) score += 2;
+    const gap = a.rank - b.rank - 1;
+    score -= [0, 1, 2, 4][gap] ?? 5;
+    if (gap <= 1 && a.rank < 12) score += 1; // beide Karten unter der Dame
+    return Math.ceil(score);
+  }
+
+  // Stärkste Handart, die schon allein auf dem Tisch liegt.
+  function boardCategory(board) {
+    if (board.length >= 5) return bestOf7(board).value.category;
+    const counts = new Map();
+    for (const c of board) counts.set(c.rank, (counts.get(c.rank) || 0) + 1);
+    const groups = [...counts.values()].sort((x, y) => y - x);
+    if (groups[0] === 4) return 7;
+    if (groups[0] === 3) return 3;
+    if (groups[0] === 2 && groups[1] === 2) return 2;
+    if (groups[0] === 2) return 1;
+    return 0;
+  }
+
+  // Vier Karten einer Farbe (mindestens eine davon auf der Hand).
+  function findFlushDraw(hole, board) {
+    const bySuit = {};
+    for (const c of [...hole, ...board]) bySuit[c.suit] = (bySuit[c.suit] || 0) + 1;
+    for (const suit of Object.keys(bySuit)) {
+      if (bySuit[suit] === 4 && hole.some((c) => c.suit === suit)) return { suit };
+    }
+    return null;
+  }
+
+  // Würde eine Straße mit dieser Karte entstehen, die mindestens eine Karte von der Hand nutzt?
+  function completesStraight(ranks, rank, holeRanks) {
+    for (let start = 1; start <= 10; start++) {
+      let all = true;
+      let usesRank = false;
+      let usesHole = false;
+      for (let x = start; x < start + 5; x++) {
+        if (!ranks.has(x)) { all = false; break; }
+        if (x === rank || (rank === 14 && x === 1)) usesRank = true;
+        if (holeRanks.has(x) || (x === 1 && holeRanks.has(14))) usesHole = true;
+      }
+      if (all && usesRank && usesHole) return true;
+    }
+    return false;
+  }
+
+  function findStraightDraw(hole, board) {
+    const ranks = new Set([...hole, ...board].map((c) => c.rank));
+    if (ranks.has(14)) ranks.add(1); // Ass auch als niedrigste Karte
+    const holeRanks = new Set(hole.map((c) => c.rank));
+    const completing = [];
+    for (let rank = 2; rank <= 14; rank++) {
+      if (ranks.has(rank)) continue;
+      const withRank = new Set(ranks);
+      withRank.add(rank);
+      if (rank === 14) withRank.add(1);
+      if (completesStraight(withRank, rank, holeRanks)) completing.push(rank);
+    }
+    if (completing.length === 0) return null;
+    return { kind: completing.length >= 2 ? 'open' : 'gutshot', ranks: completing };
+  }
+
+  // tier: monster (Drilling oder besser mit eigener Karte), strong (zwei Paare), medium (Paar mit eigener Karte),
+  // draw (offener Draw auf Straße oder Flush), weak (sonst, auch wenn nur das Board die Hand macht).
+  function analyzeHand(hole, board) {
+    if (board.length === 0) {
+      const pair = hole[0].rank === hole[1].rank;
+      return { value: null, usesHole: false, tier: pair ? 'medium' : 'weak', flushDraw: null, straightDraw: null };
+    }
+    const value = bestOf7([...hole, ...board]).value;
+    const usesHole = value.category > boardCategory(board);
+    let flushDraw = null;
+    let straightDraw = null;
+    if (board.length < 5 && value.category < 4) {
+      flushDraw = findFlushDraw(hole, board);
+      straightDraw = findStraightDraw(hole, board);
+    }
+    const goodDraw = !!flushDraw || (straightDraw !== null && straightDraw.kind === 'open');
+    let tier;
+    if (!usesHole) tier = goodDraw ? 'draw' : 'weak';
+    else if (value.category >= 3) tier = 'monster';
+    else if (value.category === 2) tier = 'strong';
+    else tier = 'medium';
+    return { value, usesHole, tier, flushDraw, straightDraw };
+  }
+
+  // --- Startkarten-Gruppen (Etappe 3): eine Quelle für Lektion, Aufgaben, Spickzettel und Coach ---
+
+  const GROUPS = ['weglegen', 'spielbar', 'stark', 'premium']; // aufsteigend
+  const GROUP_NAME_DE = { premium: 'Premium', stark: 'Stark', spielbar: 'Spielbar', weglegen: 'Weglegen' };
+  const GROUP_SENTENCE = {
+    premium: 'Das ist eine Premium-Hand',
+    stark: 'Das ist eine starke Hand',
+    spielbar: 'Das ist eine spielbare Hand',
+    weglegen: 'Das ist eine Hand zum Weglegen',
+  };
+
+  function startGroup(hole) {
+    const chen = chenScore(hole);
+    return chen >= 11 ? 'premium' : chen >= 9 ? 'stark' : chen >= 6 ? 'spielbar' : 'weglegen';
+  }
+
+  // Mindest-Gruppe zum Spielen: gegen eine Erhöhung Premium, am Button ohne Erhöhung Spielbar, sonst Stark.
+  const minGroup = (ctx) => (ctx.facingRaise ? 'premium' : ctx.onButton ? 'spielbar' : 'stark');
+
+  function shouldPlayStartHand(hole, ctx) {
+    return GROUPS.indexOf(startGroup(hole)) >= GROUPS.indexOf(minGroup(ctx));
+  }
+
+  function explainStartHand(hole, ctx) {
+    const situation = ctx.facingRaise ? 'Gegen eine Erhöhung' : ctx.onButton ? 'Am Button ohne Erhöhung' : 'Nicht am Button ohne Erhöhung';
+    const verdict = shouldPlayStartHand(hole, ctx) ? 'spielen' : 'weglegen';
+    return `${GROUP_SENTENCE[startGroup(hole)]}. ${situation} spielst du ${ctx.facingRaise ? 'erst ' : ''}ab „${GROUP_NAME_DE[minGroup(ctx)]}“ – hier also ${verdict}.`;
+  }
+
+  // 13 × 13 wie auf bekannten Pokerkarten-Tafeln: Paare auf der Diagonale, gleiche Farbe oberhalb, verschiedene unterhalb.
+  function startHandGrid() {
+    const RANK_CHARS = 'AKQJT98765432';
+    const ranks = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+    return ranks.map((rowRank, r) => ranks.map((colRank, c) => {
+      const [hi, lo] = r <= c ? [rowRank, colRank] : [colRank, rowRank];
+      const suited = r < c;
+      const cards = [{ rank: hi, suit: 's' }, { rank: lo, suit: suited ? 's' : 'h' }];
+      const label = RANK_CHARS[Math.min(r, c)] + RANK_CHARS[Math.max(r, c)] + (r === c ? '' : suited ? 's' : 'o');
+      return { label, group: startGroup(cards) };
+    }));
+  }
+
+  // --- Outs, Chance und Preis (Etappe 3) ---
+
+  // Karten, nach denen die beste Hand mindestens eine Straße ist, besser als vorher und besser als das,
+  // was das Board allein macht. Nur sinnvoll, solange noch Karten kommen (Board mit 3 oder 4 Karten).
+  function countOuts(hole, board) {
+    if (board.length < 3 || board.length > 4) return 0;
+    const seen = new Set([...hole, ...board].map((c) => c.rank + c.suit));
+    const before = bestOf7([...hole, ...board]).value.category;
+    let outs = 0;
+    for (const suit of ['s', 'h', 'd', 'c']) {
+      for (let rank = 2; rank <= 14; rank++) {
+        if (seen.has(rank + suit)) continue;
+        const after = bestOf7([...hole, ...board, { rank, suit }]).value.category;
+        if (after >= 4 && after > before && after > boardCategory([...board, { rank, suit }])) outs++;
+      }
+    }
+    return outs;
+  }
+
+  // Ein „reiner“ Draw: nur Hohe Karte, genau ein Draw (Flush oder Straße), Flop oder Turn.
+  function pureDraw(hole, board) {
+    if (board.length < 3 || board.length > 4) return null;
+    const a = analyzeHand(hole, board);
+    if (a.value.category !== 0) return null;
+    if ((a.flushDraw !== null) === (a.straightDraw !== null)) return null; // kein Draw oder zwei Draws
+    const outs = countOuts(hole, board);
+    // Nur die Standardfälle der Lektion (Flush 9, je Straßen-Rang 4). Sonderfälle wie vier Karten einer Farbe auf dem
+    // Board oder eine Straße, die schon auf dem Tisch liegt, zählen anders – dazu sagt der Coach nichts.
+    if (a.flushDraw !== null) return outs === 9 ? { kind: 'flush', outs } : null;
+    const ranks = a.straightDraw.ranks;
+    return outs === ranks.length * 4 ? { kind: 'straight', outs, ranks } : null;
+  }
+
+  // Faustregel: nach dem Flop (zwei Karten kommen) Outs × 4 %, nach dem Turn Outs × 2 %.
+  function chanceByRule(outs, boardLength) {
+    return outs * (boardLength === 3 ? 4 : 2);
+  }
+
+  // Preis eines Calls in Prozent; der Pot enthält den Einsatz des Gegners schon.
+  function callPrice(pot, toCall) {
+    return Math.round((100 * toCall) / (pot + toCall));
+  }
+
+  // Ein Feld der Startkarten-Tabelle in Worten: „AKs“ → „Ass und König in einer Farbe“, „77“ → „Paar Siebener“.
+  function describeStartCell(label) {
+    const RANK_CHARS = '23456789TJQKA';
+    const a = RANK_CHARS.indexOf(label[0]) + 2;
+    const b = RANK_CHARS.indexOf(label[1]) + 2;
+    const { rankNameDe } = P.names;
+    if (a === b) return `Paar ${rankNameDe(a, true)}`;
+    return `${rankNameDe(a, false)} und ${rankNameDe(b, false)} ${label[2] === 's' ? 'in einer Farbe' : 'in verschiedenen Farben'}`;
+  }
+
+  P.analysis = {
+    chenScore, analyzeHand, GROUPS, GROUP_NAME_DE, startGroup, shouldPlayStartHand, explainStartHand, startHandGrid,
+    countOuts, pureDraw, chanceByRule, callPrice, describeStartCell,
+  };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-hand">
+// Eine Hand No-Limit Texas Hold'em: Aufbau, Setzrunden, Sichten.
+// Reine Funktionen: Zustand rein, neuer Zustand raus (applyAction ändert die Eingabe nie).
+(function (P) {
+  const { makeDeck, shuffle } = P.cards;
+  const { bestOf7, compareValues } = P.evaluator;
+  const NEXT_STREET = { preflop: 'flop', flop: 'turn', turn: 'river' };
+  const BOARD_CARDS = { flop: 3, turn: 1, river: 1 };
+  const DEFAULT_NAMES = ['Du', 'Anna', 'Ben', 'Clara', 'Sitz 4', 'Sitz 5'];
+
+  const potOf = (h) => h.players.reduce((sum, p) => sum + p.total, 0);
+  const ceil10 = (x) => Math.ceil(x / 10) * 10;
+
+  // Muss dieser Spieler noch handeln? Wer allein übrig ist, muss nur einen höheren Einsatz beantworten.
+  function needsAction(h, seat) {
+    const p = h.players[seat];
+    if (p.folded || p.allIn) return false;
+    if (p.bet < h.currentBet) return true;
+    return !p.acted && h.players.some((q, i) => i !== seat && !q.folded && !q.allIn);
+  }
+
+  function post(h, seat, amount, type) {
+    const p = h.players[seat];
+    const paid = Math.min(amount, p.stack);
+    h.log.push({ seat, street: 'preflop', type, to: paid, allIn: paid === p.stack, toCall: 0, pot: potOf(h) });
+    p.stack -= paid;
+    p.bet += paid;
+    p.total += paid;
+    if (p.stack === 0) p.allIn = true;
+  }
+
+  function advanceStreet(h) {
+    for (const p of h.players) {
+      p.bet = 0;
+      p.acted = false;
+      p.canRaise = true;
+    }
+    h.currentBet = 0;
+    h.lastRaise = h.bigBlind;
+    h.street = NEXT_STREET[h.street];
+    h.board.push(...h.deck.splice(0, BOARD_CARDS[h.street]));
+    // Nur wenn wirklich gesetzt werden kann, beginnt eine neue Setzrunde ohne Aggressor.
+    if (h.players.filter((p) => !p.folded && !p.allIn).length >= 2) h.lastAggressor = null;
+  }
+
+  // Bestimmt nach einer Aktion den nächsten Spieler, die nächste Street oder das Ende der Hand.
+  function proceed(h, lastSeat) {
+    for (;;) {
+      if (h.players.filter((p) => !p.folded).length <= 1) {
+        h.street = 'done';
+        h.toAct = null;
+        return;
+      }
+      for (let i = 1; i <= h.n; i++) {
+        const seat = (lastSeat + i) % h.n;
+        if (needsAction(h, seat)) {
+          h.toAct = seat;
+          return;
+        }
+      }
+      if (h.street === 'river') {
+        h.street = 'showdown';
+        h.toAct = null;
+        return;
+      }
+      advanceStreet(h);
+      lastSeat = h.button; // nach dem Flop beginnt der erste Spieler links vom Button
+    }
+  }
+
+  function newHand(opts) {
+    const { stacks, button, rng, smallBlind = 10, bigBlind = 20 } = opts;
+    const n = stacks.length;
+    if (n < 3 || n > 6) throw new Error('Eine Hand braucht 3 bis 6 Spieler');
+    if (stacks.some((s) => !(s > 0))) throw new Error('Jeder Stack muss größer als 0 sein');
+    const cards = opts.deck ? opts.deck.slice() : shuffle(makeDeck(), rng);
+    const names = opts.names || DEFAULT_NAMES;
+    const h = {
+      n, button, smallBlind, bigBlind,
+      players: stacks.map((stack, i) => ({
+        name: names[i], stack, bet: 0, total: 0, cards: [cards[2 * i], cards[2 * i + 1]],
+        folded: false, allIn: false, acted: false, canRaise: true,
+      })),
+      board: [],
+      deck: cards.slice(2 * n),
+      street: 'preflop',
+      toAct: null,
+      currentBet: bigBlind,
+      lastRaise: bigBlind,
+      lastAggressor: null,
+      log: [],
+      result: null,
+    };
+    post(h, (button + 1) % n, smallBlind, 'smallBlind');
+    post(h, (button + 2) % n, bigBlind, 'bigBlind');
+    proceed(h, (button + 2) % n);
+    return h;
+  }
+
+  function legalFor(h, seat) {
+    const p = h.players[seat];
+    const toCall = Math.max(0, h.currentBet - p.bet);
+    return {
+      seat,
+      toCall,
+      canCheck: toCall === 0,
+      canCall: toCall > 0,
+      callAmount: Math.min(toCall, p.stack),
+      canRaise: p.canRaise && p.stack > toCall && !p.folded && !p.allIn,
+      minRaiseTo: Math.min(h.currentBet + h.lastRaise, p.bet + p.stack),
+      maxRaiseTo: p.bet + p.stack,
+    };
+  }
+
+  function legalActions(hand) {
+    if (hand.toAct === null) throw new Error('Es ist niemand am Zug');
+    return legalFor(hand, hand.toAct);
+  }
+
+  function applyAction(hand, action) {
+    if (hand.toAct === null) throw new Error('Es ist niemand am Zug');
+    if (action.seat !== undefined && action.seat !== hand.toAct) throw new Error(`Sitz ${action.seat} ist nicht am Zug`);
+    const h = structuredClone(hand);
+    const seat = h.toAct;
+    const p = h.players[seat];
+    const legal = legalFor(h, seat);
+    const entry = { seat, street: h.street, type: action.type, allIn: false, toCall: legal.toCall, callAmount: legal.callAmount, pot: potOf(h) };
+
+    switch (action.type) {
+      case 'fold':
+        p.folded = true;
+        break;
+      case 'check':
+        if (!legal.canCheck) throw new Error('Check ist nicht erlaubt');
+        p.acted = true;
+        break;
+      case 'call':
+        if (!legal.canCall) throw new Error('Call ist nicht erlaubt');
+        p.stack -= legal.callAmount;
+        p.bet += legal.callAmount;
+        p.total += legal.callAmount;
+        p.acted = true;
+        entry.to = p.bet;
+        entry.allIn = p.stack === 0;
+        if (p.stack === 0) p.allIn = true;
+        break;
+      case 'raise': {
+        if (!legal.canRaise) throw new Error('Erhöhung ist nicht erlaubt');
+        const to = action.to;
+        if (!Number.isInteger(to) || to > legal.maxRaiseTo) throw new Error('Raise über dem Stack');
+        const allIn = to === legal.maxRaiseTo;
+        if (to <= h.currentBet || (to < h.currentBet + h.lastRaise && !allIn)) throw new Error('Raise unter dem Minimum');
+        entry.type = h.currentBet === 0 ? 'bet' : 'raise';
+        entry.to = to;
+        entry.allIn = allIn;
+        const add = to - p.bet;
+        p.stack -= add;
+        p.bet = to;
+        p.total += add;
+        p.acted = true;
+        if (allIn) p.allIn = true;
+        const increase = to - h.currentBet;
+        if (increase >= h.lastRaise) {
+          // Volle Erhöhung: alle anderen müssen erneut handeln und dürfen wieder erhöhen.
+          h.lastRaise = increase;
+          h.players.forEach((q, i) => {
+            if (i !== seat && !q.folded && !q.allIn) {
+              q.acted = false;
+              q.canRaise = true;
+            }
+          });
+        } else {
+          // Kurzes All-in: wer schon gehandelt hat, darf nur noch mitgehen oder aufgeben.
+          h.players.forEach((q, i) => {
+            if (i !== seat && q.acted) q.canRaise = false;
+          });
+        }
+        h.currentBet = to;
+        h.lastAggressor = seat;
+        break;
+      }
+      default:
+        throw new Error('Unbekannte Aktion');
+    }
+    h.log.push(entry);
+    proceed(h, seat);
+    return h;
+  }
+
+  // Alles, was der Spieler auf diesem Sitz wissen darf – keine fremden Karten.
+  function viewFor(hand, seat) {
+    const p = hand.players[seat];
+    const legal = legalFor(hand, seat);
+    return {
+      seat,
+      hole: p.cards.slice(),
+      board: hand.board.slice(),
+      street: hand.street,
+      pot: potOf(hand),
+      stack: p.stack,
+      bet: p.bet,
+      currentBet: hand.currentBet,
+      toCall: legal.toCall,
+      canCheck: legal.canCheck,
+      canCall: legal.canCall,
+      canRaise: legal.canRaise,
+      minRaiseTo: legal.minRaiseTo,
+      maxRaiseTo: legal.maxRaiseTo,
+      bigBlind: hand.bigBlind,
+      opponentsLeft: hand.players.filter((q, i) => i !== seat && !q.folded).length,
+      raisesThisStreet: hand.log.filter((e) => e.street === hand.street && (e.type === 'bet' || e.type === 'raise')).length,
+      // Für den Coach: Position und was vor dem Flop passiert ist (alles öffentlich bekannt).
+      onButton: hand.button === seat,
+      facingRaise: hand.log.some((e) => e.street === 'preflop' && e.type === 'raise' && e.seat !== seat),
+      hasActed: hand.log.some((e) => e.street === 'preflop' && e.seat === seat && (e.type === 'call' || e.type === 'raise')),
+    };
+  }
+
+  // Schnellwahl für die Höhe einer Erhöhung: Mindest-Raise, halber Pot, Pot, All-in.
+  function raiseSizes(view) {
+    const sized = (fraction) => Math.min(view.maxRaiseTo,
+      Math.max(view.minRaiseTo, view.currentBet + ceil10(fraction * (view.pot + view.toCall))));
+    return { min: view.minRaiseTo, half: sized(0.5), pot: sized(1), allIn: view.maxRaiseTo };
+  }
+
+  // --- Nebenpots und Auszahlung ---
+
+  // Teilt die Einsätze in Haupt- und Nebenpots. Gefoldete Spieler zahlen ein, gewinnen aber nie.
+  // players: [{total, folded}] je Sitz.
+  function buildPots(players) {
+    const levels = [...new Set(players.filter((p) => !p.folded && p.total > 0).map((p) => p.total))].sort((a, b) => a - b);
+    const pots = [];
+    let previous = 0;
+    for (const level of levels) {
+      let amount = 0;
+      const eligible = [];
+      players.forEach((p, seat) => {
+        amount += Math.max(0, Math.min(p.total, level) - previous);
+        if (!p.folded && p.total >= level) eligible.push(seat);
+      });
+      if (amount > 0) pots.push({ amount, eligible });
+      previous = level;
+    }
+    // Toter Einsatz über dem höchsten Einsatz eines aktiven Spielers (z. B. gefoldeter Small Blind gegen einen
+    // kurzen All-in-Big-Blind) gehört in den höchsten Pot, sonst gingen Chips verloren.
+    const dead = players.reduce((sum, p) => sum + Math.max(0, p.total - previous), 0);
+    if (dead > 0 && pots.length > 0) pots[pots.length - 1].amount += dead;
+    return pots;
+  }
+
+  // Zahlt die Pots aus und setzt `result`. Nur für beendete Hände (Showdown oder alle anderen gefoldet).
+  function settle(hand) {
+    if (hand.street !== 'showdown' && hand.street !== 'done') throw new Error('Die Hand ist noch nicht beendet');
+    const h = structuredClone(hand);
+    const n = h.n;
+    const live = h.players.map((p, seat) => seat).filter((seat) => !h.players[seat].folded);
+    const showdown = live.length > 1;
+    const pots = buildPots(h.players);
+    const payouts = h.players.map(() => 0);
+    const winnersByPot = [];
+    let hands = [];
+    let revealOrder = [];
+
+    const values = {};
+    if (showdown) {
+      for (const seat of live) values[seat] = bestOf7([...h.players[seat].cards, ...h.board]).value;
+      const from = h.lastAggressor !== null && live.includes(h.lastAggressor) ? h.lastAggressor : (h.button + 1) % n;
+      for (let i = 0; i < n; i++) {
+        const seat = (from + i) % n;
+        if (live.includes(seat)) revealOrder.push(seat);
+      }
+      hands = revealOrder.map((seat) => ({ seat, value: values[seat] }));
+    }
+
+    const distanceFromButton = (seat) => (((seat - h.button - 1) % n) + n) % n;
+    for (const pot of pots) {
+      let winners = pot.eligible;
+      if (showdown && winners.length > 1) {
+        let best = values[winners[0]];
+        for (const seat of winners) if (compareValues(values[seat], best) > 0) best = values[seat];
+        winners = winners.filter((seat) => compareValues(values[seat], best) === 0);
+      }
+      winners = winners.slice().sort((a, b) => distanceFromButton(a) - distanceFromButton(b));
+      const share = Math.floor(pot.amount / winners.length);
+      const odd = pot.amount - share * winners.length;
+      winners.forEach((seat, i) => { payouts[seat] += share + (i < odd ? 1 : 0); });
+      winnersByPot.push(winners);
+    }
+
+    h.players.forEach((p, seat) => { p.stack += payouts[seat]; });
+    h.street = 'done';
+    h.toAct = null;
+    h.result = { showdown, pots, winnersByPot, payouts, hands, revealOrder };
+    return h;
+  }
+
+  P.hand = { newHand, viewFor, legalActions, applyAction, raiseSizes, buildPots, settle };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-session">
+// Der Tisch über mehrere Hände: Stacks, Button, Nachkaufen. Reine Funktionen.
+// Table = {stacks: number[4], button, hands, coach} – das ist auch der gespeicherte Stand.
+(function (P) {
+  const { newHand, viewFor, applyAction, settle } = P.hand;
+  const START_STACK = 1000;
+  const SEATS = 4;
+  const NAMES = ['Du', 'Anna', 'Ben', 'Clara'];
+
+  function createTable(rng) {
+    return {
+      stacks: new Array(SEATS).fill(START_STACK),
+      button: Math.floor(rng() * SEATS),
+      hands: 0,
+      coach: true,
+    };
+  }
+
+  // Bots ohne Chips kaufen automatisch nach. Der Spieler muss vorher bewusst neu starten (restartHuman).
+  function startHand(table, rng) {
+    if (table.stacks[0] === 0) throw new Error('Du hast keine Chips mehr');
+    const stacks = table.stacks.map((s, seat) => (seat > 0 && s === 0 ? START_STACK : s));
+    return newHand({ stacks, button: table.button, rng, names: NAMES });
+  }
+
+  function finishHand(table, hand) {
+    if (hand.street !== 'done' || !hand.result) throw new Error('Die Hand ist noch nicht abgerechnet');
+    return {
+      stacks: hand.players.map((p) => p.stack),
+      button: (table.button + 1) % SEATS,
+      hands: table.hands + 1,
+      coach: table.coach,
+    };
+  }
+
+  function restartHuman(table) {
+    return { ...table, stacks: table.stacks.map((s, seat) => (seat === 0 ? START_STACK : s)) };
+  }
+
+  // Spielt eine ganze Hand. decide(view, seat) liefert die Aktion für den Sitz am Zug (Tests und Simulationen).
+  function playHand(table, decide, rng) {
+    let hand = startHand(table, rng);
+    for (let guard = 0; hand.toAct !== null; guard++) {
+      if (guard > 500) throw new Error('Die Hand endet nicht');
+      const seat = hand.toAct;
+      hand = applyAction(hand, { ...decide(viewFor(hand, seat), seat), seat });
+    }
+    hand = settle(hand);
+    return { hand, table: finishHand(table, hand) };
+  }
+
+  P.session = { START_STACK, SEATS, NAMES, createTable, startHand, finishHand, restartHuman, playHand };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-bots">
+// Computer-Gegner: einfache Regeln, leicht verschiedene Stile. Sie bekommen nur ihre eigene Sicht (View).
+(function (P) {
+  const { chenScore, analyzeHand } = P.analysis;
+  const { raiseSizes } = P.hand;
+
+  // play/raise: ab dieser Chen-Zahl geht der Bot mit bzw. erhöht; bluff: Anteil Bluffs;
+  // callMedium/callDraw: wie groß ein Einsatz (Anteil am Pot) sein darf, den er mit Paar bzw. Draw noch bezahlt.
+  const BOT_STYLES = {
+    vorsichtig: { play: 8, raise: 11, bluff: 0.03, callMedium: 1 / 3, callDraw: 1 / 3 },
+    ausgewogen: { play: 6, raise: 10, bluff: 0.08, callMedium: 1 / 2, callDraw: 1 / 2 },
+    locker: { play: 4, raise: 9, bluff: 0.15, callMedium: 1, callDraw: 1 },
+  };
+  const BOT_BY_SEAT = { 1: 'vorsichtig', 2: 'locker', 3: 'ausgewogen' };
+
+  const FOLD = { type: 'fold' };
+  const CHECK = { type: 'check' };
+  const CALL = { type: 'call' };
+  const checkOrCall = (view) => (view.canCheck ? CHECK : CALL);
+  const ceil10 = (x) => Math.ceil(x / 10) * 10;
+
+  // Erhöhen, wenn erlaubt (höchstens dreimal pro Setzrunde); wer mindestens 60 % seines Stacks setzen würde, geht All-in.
+  function raiseTo(view, target) {
+    if (!view.canRaise || view.raisesThisStreet >= 3) return checkOrCall(view);
+    let to = Math.max(view.minRaiseTo, Math.min(view.maxRaiseTo, ceil10(target)));
+    if (to - view.bet >= 0.6 * view.stack) to = view.maxRaiseTo;
+    return { type: 'raise', to };
+  }
+
+  function preflop(view, style, rng) {
+    const chen = chenScore(view.hole);
+    const unopened = view.currentBet <= view.bigBlind;
+    if (unopened && chen >= style.raise) return raiseTo(view, 3 * view.bigBlind);
+    if (chen >= style.raise + 4) return raiseTo(view, 3 * view.currentBet); // nur Premiumhände erhöhen erneut
+    if (view.canCheck) return unopened && rng() < style.bluff ? raiseTo(view, 3 * view.bigBlind) : CHECK;
+    const limit = chen >= style.raise ? 0.5 : chen >= style.play ? 0.25 : 0; // Anteil des Stacks, den ein Call kosten darf
+    if (limit > 0 && view.toCall <= limit * view.stack) return CALL;
+    if (unopened && rng() < style.bluff) return raiseTo(view, 3 * view.bigBlind); // Bluff nur als Eröffnung
+    return FOLD;
+  }
+
+  function postflop(view, style, styleName, rng) {
+    const { tier } = analyzeHand(view.hole, view.board);
+    const sizes = raiseSizes(view);
+    const facing = view.toCall > 0;
+    const allInCall = facing && view.toCall >= view.stack;
+    switch (tier) {
+      case 'monster':
+        if (!facing) return rng() < 0.85 ? raiseTo(view, sizes.half) : CHECK;
+        return rng() < 0.6 ? raiseTo(view, sizes.pot) : CALL;
+      case 'strong':
+        if (!facing) return rng() < 0.7 ? raiseTo(view, sizes.half) : CHECK;
+        return CALL;
+      case 'medium':
+        if (!facing) return rng() < (styleName === 'locker' ? 0.5 : 0.3) ? raiseTo(view, sizes.half) : CHECK;
+        if (allInCall && styleName !== 'locker') return FOLD;
+        return view.toCall <= style.callMedium * view.pot ? CALL : FOLD;
+      case 'draw':
+        if (!facing) return CHECK;
+        if (allInCall) return FOLD;
+        return view.toCall <= style.callDraw * view.pot ? CALL : FOLD;
+      default:
+        if (!facing) return rng() < style.bluff ? raiseTo(view, sizes.half) : CHECK;
+        return FOLD;
+    }
+  }
+
+  // Liefert immer eine zulässige Aktion; gibt nie auf, wenn Check kostenlos ist.
+  function botDecision(view, styleName, rng) {
+    const name = BOT_STYLES[styleName] ? styleName : 'ausgewogen';
+    const style = BOT_STYLES[name];
+    return view.board.length === 0 ? preflop(view, style, rng) : postflop(view, style, name, rng);
+  }
+
+  P.bots = { BOT_STYLES, BOT_BY_SEAT, botDecision };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-coach">
+// Der Coach: beschreibt und erklärt, statt zu bevormunden. Er kennt nur die Sicht des Spielers
+// (eigene Karten, Board, Protokoll) und markiert nur zwei klare Patzer.
+(function (P) {
+  const { analyzeHand, startGroup, shouldPlayStartHand, pureDraw, chanceByRule, callPrice } = P.analysis;
+  const { describeHandDe, rankNameDe } = P.names;
+  const { bestOf7 } = P.evaluator;
+
+  const SUIT_DE = { s: 'Pik', h: 'Herz', d: 'Karo', c: 'Kreuz' };
+  const BOARD_CARDS = { flop: 3, turn: 4, river: 5 };
+  const NEUTRAL = 'Bei deinen Zügen ist mir nichts Auffälliges aufgefallen.';
+  const FREE_CHECK_FOLD = 'Du hast aufgegeben, obwohl Check nichts gekostet hätte – mit Check bleibst du kostenlos dabei.';
+  const ALL_IN_NOTHING = 'Du bist mit All-in mitgegangen, obwohl du (noch) nichts auf der Hand hattest – das war riskant.';
+
+  // „eine Fünf“, „eine Dame“, aber „ein Bube“, „ein König“, „ein Ass“
+  const withArticle = (rank) => (rank === 11 || rank === 13 || rank === 14 ? 'ein ' : 'eine ') + rankNameDe(rank, false);
+
+  function listDe(items) {
+    return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} und ${items[items.length - 1]}`;
+  }
+
+  // Die Hand, die schon allein auf dem Tisch liegt (Paar oder besser), sonst null.
+  function boardHand(board) {
+    if (board.length >= 5) {
+      const value = bestOf7(board).value;
+      return value.category >= 1 ? value : null;
+    }
+    const counts = new Map();
+    for (const c of board) counts.set(c.rank, (counts.get(c.rank) || 0) + 1);
+    const groups = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0]);
+    if (!groups.length) return null;
+    if (groups[0][1] === 4) return { category: 7, tiebreak: [groups[0][0]] };
+    if (groups[0][1] === 3) return { category: 3, tiebreak: [groups[0][0]] };
+    if (groups[0][1] === 2 && groups[1] && groups[1][1] === 2) return { category: 2, tiebreak: [groups[0][0], groups[1][0]] };
+    if (groups[0][1] === 2) return { category: 1, tiebreak: [groups[0][0]] };
+    return null;
+  }
+
+  // Ein Satz: was du hast und was dir noch fehlen könnte – ohne Wahrscheinlichkeiten.
+  function describeSituation(hole, board) {
+    if (board.length === 0) {
+      const [a, b] = hole[0].rank >= hole[1].rank ? hole : [hole[1], hole[0]];
+      if (a.rank === b.rank) return `Du hast ein Paar ${rankNameDe(a.rank, true)}.`;
+      const suited = a.suit === b.suit ? 'in einer Farbe' : 'in verschiedenen Farben';
+      return `Du hast ${rankNameDe(a.rank, false)} und ${rankNameDe(b.rank, false)} ${suited}.`;
+    }
+    const analysis = analyzeHand(hole, board);
+    if (!analysis.usesHole) {
+      const onTable = boardHand(board);
+      if (onTable) return `Auf dem Tisch liegt ${describeHandDe(onTable)} – deine Karten verbessern das nicht.`;
+    }
+    const hopes = [];
+    if (analysis.flushDraw) hopes.push(`noch ein ${SUIT_DE[analysis.flushDraw.suit]} fehlt dir für den Flush`);
+    if (analysis.straightDraw) {
+      const [first, ...rest] = analysis.straightDraw.ranks;
+      const ranks = [withArticle(first), ...rest.map((r) => rankNameDe(r, false))].join(' oder ');
+      hopes.push(`dir fehlt noch ${ranks} für die Straße`);
+    }
+    return `Du hast ${describeHandDe(analysis.value)}${hopes.length ? ` – ${hopes.join(' und ')}` : ''}.`;
+  }
+
+  const GROUP_PHRASE = {
+    premium: 'eine Premium-Hand',
+    stark: 'eine starke Hand',
+    spielbar: 'eine spielbare Hand',
+    weglegen: 'eine Hand zum Weglegen',
+  };
+
+  // Vor dem Flop: die Gruppe der Starthand und – nur bei der ersten freiwilligen Entscheidung – ein sanfter Rat.
+  function startTail(view) {
+    const group = startGroup(view.hole);
+    let advice = '';
+    if (!view.hasActed) {
+      if (view.canCheck) {
+        advice = group === 'premium' || group === 'stark' ? ', hier lohnt sich Erhöhen'
+          : group === 'weglegen' ? ', aber du kannst kostenlos checken' : ', du kannst kostenlos checken';
+      } else if (group !== 'weglegen') {
+        advice = shouldPlayStartHand(view.hole, view) ? ', hier lohnt sich Mitspielen'
+          : view.facingRaise ? ', gegen eine Erhöhung ist Weglegen meist besser' : ', hier ist Weglegen meist besser';
+      }
+    }
+    return `${GROUP_PHRASE[group]}${advice}`;
+  }
+
+  // Die Hilfe vor einer Entscheidung. learned = welche Stufe-4-Einheiten bestanden sind: ohne bestandene Einheit
+  // ist sie wie in Etappe 2. Outs und Preis nur bei einem reinen Draw, nie vor dem Flop.
+  function hintFor(view, learned = {}) {
+    const base = describeSituation(view.hole, view.board);
+    if (view.board.length === 0) return learned.start ? `${base.slice(0, -1)} – ${startTail(view)}.` : base;
+    const draw = learned.outs || learned.odds ? pureDraw(view.hole, view.board) : null;
+    const parts = [base];
+    if (draw && learned.outs) {
+      const chance = learned.odds ? `, etwa ${chanceByRule(draw.outs, view.board.length)} %` : '';
+      parts.push(`Das sind ${draw.outs} Outs${chance}.`);
+    }
+    // Reicht der Stack nicht für den ganzen Einsatz, ist der Call ein kleineres All-in mit Nebenpot: dann kein Preis.
+    if (draw && learned.odds && view.toCall > 0 && !(view.stack < view.toCall)) {
+      parts.push(`Der Call kostet ${view.toCall} von ${view.pot + view.toCall} Chips: du brauchst etwa ${callPrice(view.pot, view.toCall)} %.`);
+    }
+    return parts.join(' ');
+  }
+
+  // „Sieben und Zwei“ bzw. „einem Paar Zweier“ (für „Mit … ist Weglegen …“)
+  function handLabel(hole) {
+    const [a, b] = hole[0].rank >= hole[1].rank ? hole : [hole[1], hole[0]];
+    return a.rank === b.rank ? `einem Paar ${rankNameDe(a.rank, true)}` : `${rankNameDe(a.rank, false)} und ${rankNameDe(b.rank, false)}`;
+  }
+
+  // Startkarten: nur die erste freiwillige Entscheidung des Spielers vor dem Flop, und nur gegen eine Erhöhung eines anderen.
+  function startNote(hand, seat) {
+    const hole = hand.players[seat].cards;
+    const index = hand.log.findIndex((e) => e.seat === seat && e.street === 'preflop' && ['fold', 'call', 'raise'].includes(e.type));
+    if (index < 0) return null;
+    const first = hand.log[index];
+    const facingRaise = hand.log.slice(0, index).some((e) => e.street === 'preflop' && e.type === 'raise' && e.seat !== seat);
+    if (!facingRaise) return null;
+    const group = startGroup(hole);
+    if (first.type === 'call' && group === 'weglegen') return `Mit ${handLabel(hole)} ist Weglegen gegen eine Erhöhung meist besser.`;
+    if (first.type === 'fold' && group === 'premium') return 'Premium-Hände spielt man meist – auch gegen eine Erhöhung.';
+    return null;
+  }
+
+  // Pot Odds: die erste Entscheidung gegen einen Einsatz mit einem reinen Draw, bei der Preis und Chance mehr als
+  // 10 Prozentpunkte auseinanderliegen.
+  function oddsNote(hand, seat) {
+    const hole = hand.players[seat].cards;
+    for (const e of hand.log) {
+      if (e.seat !== seat || e.street === 'preflop' || e.toCall <= 0 || (e.type !== 'call' && e.type !== 'fold')) continue;
+      if (e.callAmount < e.toCall) continue; // Stack zu kurz für den ganzen Einsatz: ein kleineres All-in, der Preis stimmt nicht
+      const board = hand.board.slice(0, BOARD_CARDS[e.street]);
+      const draw = pureDraw(hole, board);
+      if (!draw) continue;
+      const chance = chanceByRule(draw.outs, board.length);
+      const price = callPrice(e.pot, e.toCall);
+      if (e.type === 'call' && price - chance > 10) return `Der Call war teuer: du brauchtest etwa ${price} %, hattest aber nur etwa ${chance} %.`;
+      if (e.type === 'fold' && chance - price > 10) return `Hier hätte sich der Call gelohnt: du hattest etwa ${chance} %, gebraucht hättest du nur ${price} %.`;
+    }
+    return null;
+  }
+
+  // Der Hinweis dieser Hand, höchstens einer. Reihenfolge: Fold bei kostenlosem Check, All-in-Call mit nichts,
+  // Startkarten, Pot Odds (die beiden letzten nur für bestandene Einheiten).
+  function blunderNote(hand, seat, learned = {}) {
+    const hole = hand.players[seat].cards;
+    for (const e of hand.log) {
+      if (e.seat !== seat) continue;
+      if (e.type === 'fold' && e.toCall === 0) return FREE_CHECK_FOLD;
+      if (e.type === 'call' && e.allIn && e.street !== 'preflop') {
+        const a = analyzeHand(hole, hand.board.slice(0, BOARD_CARDS[e.street]));
+        if (a.tier === 'weak' && !a.flushDraw && !a.straightDraw) return ALL_IN_NOTHING;
+      }
+    }
+    return (learned.start && startNote(hand, seat)) || (learned.odds && oddsNote(hand, seat)) || null;
+  }
+
+  // Rückschau nach der Hand: höchstens drei Sätze (Ergebnis, „Du hattest …“, ein Hinweis oder der neutrale Satz).
+  function reviewHand(hand, seat, learned = {}) {
+    const r = hand.result;
+    const nameOf = (i) => (i === seat ? 'Du' : hand.players[i].name);
+    const verb = (i) => (i === seat ? 'gewinnst' : 'gewinnt');
+    const winners = (r.winnersByPot[0] || []).slice().sort((a, b) => (a === seat ? -1 : b === seat ? 1 : a - b));
+    const lines = [];
+    if (!r.showdown) {
+      lines.push(`${nameOf(winners[0])} ${verb(winners[0])}, weil alle anderen aufgegeben haben.`);
+    } else {
+      const value = r.hands.find((h) => h.seat === winners[0]).value;
+      lines.push(winners.length === 1
+        ? `${nameOf(winners[0])} ${verb(winners[0])} mit ${describeHandDe(value)}.`
+        : `${listDe(winners.map(nameOf))} teilen den Pot mit ${describeHandDe(value)}.`);
+      const mine = r.hands.find((h) => h.seat === seat);
+      if (mine && !winners.includes(seat)) lines.push(`Du hattest ${describeHandDe(mine.value)}.`);
+    }
+    const acted = hand.log.some((e) => e.seat === seat && ['fold', 'check', 'call', 'bet', 'raise'].includes(e.type));
+    if (acted) lines.push(blunderNote(hand, seat, learned) || NEUTRAL);
+    return lines;
+  }
+
+  // --- Texte zum Ergebnis einer Hand (Sitz 0 ist der Mensch, „Du“) ---
+
+  const SIDE_POT_NOTE = 'Nebenpot: Wer All-in ist, kann von jedem Gegner höchstens so viel gewinnen, wie er selbst gesetzt hat. ' +
+    'Was die anderen darüber hinaus setzen, kommt in einen Nebenpot, um den nur sie spielen.';
+
+  // Wer bekommt welchen Pot, womit. Ein Pot, den nur ein Spieler gewinnen kann, wird als Rückzahlung
+  // (der Teil, den niemand gedeckt hat) plus Gewinn (gedeckter und gefoldeter Einsatz) erzählt.
+  function resultLines(hand) {
+    const r = hand.result;
+    const players = hand.players;
+    const name = (i) => players[i].name;
+    const pick = (i, you, other) => (i === 0 ? you : other);
+    if (!r.showdown) {
+      const w = r.winnersByPot[0][0];
+      return [`${name(w)} ${pick(w, 'bekommst', 'bekommt')} den Pot (${r.payouts[w]} Chips), weil alle anderen aufgegeben haben.`];
+    }
+    const levels = [...new Set(players.filter((p) => !p.folded && p.total > 0).map((p) => p.total))].sort((a, b) => a - b);
+    const contested = r.pots.filter((p) => p.eligible.length >= 2).length;
+    let contestedSeen = 0;
+    return r.pots.map((pot, i) => {
+      const winners = r.winnersByPot[i];
+      if (pot.eligible.length === 1) {
+        const s = winners[0];
+        const previous = i === 0 ? 0 : levels[i - 1];
+        const part = (j) => Math.max(0, Math.min(players[j].total, levels[i]) - previous);
+        const maxOther = Math.max(0, ...players.map((_, j) => (j === s ? 0 : part(j))));
+        const returned = Math.max(0, part(s) - maxOther);
+        const won = pot.amount - returned;
+        if (won === 0) return `${name(s)} ${pick(s, 'bekommst', 'bekommt')} ${returned} Chips zurück (nicht gedeckter Einsatz).`;
+        if (returned === 0) return `${name(s)} ${pick(s, 'gewinnst', 'gewinnt')} ${won} Chips, weil niemand mehr mithalten konnte.`;
+        return `${name(s)} ${pick(s, 'bekommst', 'bekommt')} ${returned} Chips zurück (nicht gedeckter Einsatz) und ${pick(s, 'gewinnst', 'gewinnt')} ${won} Chips.`;
+      }
+      const label = contested === 1 ? 'Pot' : contestedSeen++ === 0 ? 'Hauptpot' : `Nebenpot ${contestedSeen - 1}`;
+      const value = r.hands.find((x) => x.seat === winners[0]).value;
+      const ordered = winners.slice().sort((a, b) => (a === 0 ? -1 : b === 0 ? 1 : a - b));
+      const verb = winners.length > 1 ? 'teilen sich den Pot' : pick(winners[0], 'gewinnst', 'gewinnt');
+      return `${label} (${pot.amount} Chips): ${listDe(ordered.map(name))} ${verb} mit ${describeHandDe(value)}.`;
+    });
+  }
+
+  // Der Nettowert für den Spieler, getrennt vom Pot, damit „Pot“ und „Gewinn“ nicht verwechselt werden.
+  function netLine(hand) {
+    const net = hand.result.payouts[0] - hand.players[0].total;
+    const sign = net > 0 ? '+' : net < 0 ? '−' : '±';
+    return `Unterm Strich für dich: ${sign}${Math.abs(net)} Chips.`;
+  }
+
+  // Wer am Showdown zuerst zeigt: der letzte Aggressor, sonst der erste links vom Button.
+  function revealLine(hand) {
+    const r = hand.result;
+    if (!r.showdown) return null;
+    const order = r.revealOrder;
+    const first = order[0];
+    const reason = hand.lastAggressor !== null && hand.lastAggressor === first ? 'letzter Einsatz' : 'links vom Button';
+    const name = (i) => hand.players[i].name;
+    return `Aufdecken: ${name(first)} ${first === 0 ? 'zeigst' : 'zeigt'} zuerst (${reason}), danach ${listDe(order.slice(1).map(name))}.`;
+  }
+
+  // Nur wenn es einen Pot gibt, um den wirklich mehrere spielen (nicht bei einer reinen Rückzahlung).
+  function sidePotNote(hand) {
+    return hand.result.pots.some((p, i) => i >= 1 && p.eligible.length >= 2) ? SIDE_POT_NOTE : null;
+  }
+
+  P.coach = { describeSituation, hintFor, reviewHand, resultLines, netLine, revealLine, sidePotNote };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-ui-base">
+// Oberfläche: Grundgerüst, Startseite, Spickzettel. Alles hängt am Namensraum Poker.ui.
+(function (P) {
+  const ui = (P.ui = P.ui || {});
+  const { names: Names, progress: Prog, content: Content } = P;
+  const { parseCards } = P.cards;
+
+  const SUIT_SYMBOL = { s: '♠', h: '♥', d: '♦', c: '♣' };
+  const RANK_LABEL = { 10: '10', 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+  const STAGE_LABEL = {
+    'stage0': 'Stufe 0',
+    'stage1-group1': 'Stufe 1 · Teil 1',
+    'stage1-group2': 'Stufe 1 · Teil 2',
+    'stage1-group3': 'Stufe 1 · Teil 3',
+    'stage1-final': 'Stufe 1 · Abschluss',
+    'stage2': 'Stufe 2',
+    'stage3': 'Stufe 3',
+    'stage4-start': 'Stufe 4 · Startkarten',
+    'stage4-position': 'Stufe 4 · Position',
+    'stage4-outs': 'Stufe 4 · Outs',
+    'stage4-odds': 'Stufe 4 · Chance und Pot Odds',
+  };
+
+  // Baut ein Element. attrs: class, on<Ereignis>, sonst normale Attribute (true = ohne Wert).
+  function h(tag, attrs, ...children) {
+    const el = document.createElement(tag);
+    for (const [name, value] of Object.entries(attrs || {})) {
+      if (value === false || value === null || value === undefined) continue;
+      if (name === 'class') el.className = value;
+      else if (name.startsWith('on')) el.addEventListener(name.slice(2), value);
+      else el.setAttribute(name, value === true ? '' : value);
+    }
+    for (const child of children.flat()) {
+      if (child === null || child === undefined || child === false) continue;
+      el.append(child.nodeType ? child : document.createTextNode(String(child)));
+    }
+    return el;
+  }
+
+  const state = { store: null, rng: Math.random, root: null, layout: null, main: null, sheet: null, sheetBtn: null, recoveredShown: false, flash: null };
+  const unitRunners = {}; // unitId -> function(unitId); tragen die Blöcke m-ui-stage* ein
+
+  // --- Karten ---
+
+  function renderCard(card, className) {
+    const red = card.suit === 'h' || card.suit === 'd';
+    return h('div', {
+      class: 'card ' + (red ? 'red' : 'black') + (className ? ' ' + className : ''),
+      role: 'img',
+      'aria-label': Names.cardNameDe(card),
+    },
+    h('span', { class: 'rank' }, RANK_LABEL[card.rank] || String(card.rank)),
+    h('span', { class: 'suit' }, SUIT_SYMBOL[card.suit]));
+  }
+
+  function renderCards(cards, className) {
+    return h('div', { class: 'hand' + (className ? ' ' + className : '') }, cards.map((c) => renderCard(c)));
+  }
+
+  // --- Spickzettel ---
+
+  function buildSheet() {
+    const rows = [];
+    for (let category = 9; category >= 0; category--) {
+      rows.push(h('li', { class: 'sheet-row' },
+        h('span', { class: 'sheet-name' }, `${10 - category}. ${Names.firstMention(category)}`),
+        renderCards(parseCards(Content.rankLessons[category].example), 'mini')));
+    }
+    return h('aside', { class: 'sheet', id: 'sheet', 'aria-label': 'Spickzettel', hidden: true },
+      h('button', { class: 'btn sheet-close', type: 'button', onclick: () => toggleCheatSheet(false) }, 'Schließen'),
+      h('h2', {}, 'Spickzettel'),
+      h('p', { class: 'muted small' }, 'Die stärkste Hand steht oben.'),
+      h('ul', { class: 'sheet-list' }, rows),
+      h('p', { class: 'muted small' }, 'Auf Pokerkarten steht J für Bube, Q für Dame, K für König und A für Ass.'),
+      state.store.isUnlocked('stage4-start') ? strategySections() : null);
+  }
+
+  // Ab der ersten freigeschalteten Stufe-4-Einheit: Startkarten-Tabelle (13 × 13) und Faustregeln.
+  function strategySections() {
+    const { GROUPS, GROUP_NAME_DE, startHandGrid, describeStartCell } = P.analysis;
+    // Tippen auf ein Feld zeigt die Hand in Worten (die Beschriftung der Zellen ist auf dem Handy klein).
+    const detail = h('p', { class: 'grid-detail muted', 'aria-live': 'polite' }, 'Tippe auf ein Feld, um die Hand zu sehen.');
+    const grid = h('table', {
+      class: 'start-grid',
+      'aria-label': 'Startkarten-Tabelle',
+      onclick: (event) => {
+        const cell = event.target.closest('td');
+        if (cell) detail.textContent = cell.getAttribute('data-detail');
+      },
+    },
+    h('tbody', {}, startHandGrid().map((row) => h('tr', {}, row.map((cell) => h('td', {
+      class: 'g-' + cell.group,
+      title: `${cell.label}: ${GROUP_NAME_DE[cell.group]}`,
+      'data-detail': `${describeStartCell(cell.label)} – ${GROUP_NAME_DE[cell.group]}`,
+    }, cell.label))))));
+    return h('div', { class: 'strategy' },
+      h('h3', {}, 'Startkarten'),
+      grid,
+      detail,
+      h('div', { class: 'group-legend' }, GROUPS.slice().reverse().map((g) => h('span', { class: 'group-chip g-' + g }, GROUP_NAME_DE[g]))),
+      h('p', { class: 'muted small' }, 'Paare auf der Diagonale, gleiche Farbe oberhalb, verschiedene Farben unterhalb.'),
+      h('h3', {}, 'Faustregeln'),
+      h('ul', { class: 'rules' }, Content.stage4.cheatSheet.map((line) => h('li', {}, line))));
+  }
+
+  // „Schmal“ (Handy): der Spickzettel öffnet als Blatt über der Seite, nicht daneben. Dieselbe Grenze wie im CSS.
+  const isNarrow = () => window.matchMedia('(max-width: 899px)').matches;
+
+  function toggleCheatSheet(open) {
+    const next = open === undefined ? state.sheet.hidden : open;
+    const wasOpen = !state.sheet.hidden;
+    state.sheet.hidden = !next;
+    state.layout.classList.toggle('with-sheet', next);
+    document.body.classList.toggle('sheet-open', next); // sperrt auf schmalen Bildschirmen das Scrollen dahinter
+    state.sheetBtn.setAttribute('aria-expanded', String(next));
+    state.sheetBtn.textContent = next ? 'Spickzettel schließen' : 'Spickzettel';
+    if (isNarrow()) {
+      if (next && !wasOpen) state.sheet.querySelector('.sheet-close').focus();
+      else if (!next && wasOpen) state.sheetBtn.focus();
+    }
+  }
+
+  // --- Seitengerüst ---
+
+  // Setzt eine neue Seite zusammen. opts.sheet: Spickzettel zuerst offen; opts.back: Link zur Übersicht.
+  function show(main, opts = {}) {
+    state.sheet = buildSheet();
+    state.sheetBtn = h('button', { class: 'btn ghost', type: 'button', 'aria-controls': 'sheet', onclick: () => toggleCheatSheet() }, 'Spickzettel');
+    state.main = h('main', {}, main);
+    state.layout = h('div', { class: 'layout' }, state.main, state.sheet);
+    const bar = h('header', { class: 'topbar' },
+      h('a', { class: 'brand', href: '#/' }, '♠ Poker lernen'),
+      h('div', { class: 'topbar-actions' }, opts.back ? h('a', { class: 'btn ghost', href: '#/' }, '← Übersicht') : null, state.sheetBtn));
+    const notices = [];
+    if (!state.store.persistent) {
+      notices.push(h('div', { class: 'notice', role: 'status' }, 'Dein Fortschritt wird in diesem Browser nicht gespeichert.'));
+    }
+    if (state.store.recovered && !state.recoveredShown) {
+      state.recoveredShown = true; // nur einmal zeigen
+      notices.push(h('div', { class: 'notice', role: 'status' }, 'Dein gespeicherter Fortschritt konnte nicht gelesen werden. Du startest mit leerem Stand.'));
+    }
+    if (state.flash) { // eine einmalige Rückmeldung, z. B. nach dem Einfügen eines Codes
+      notices.push(h('div', { class: 'notice', role: 'status' }, state.flash));
+      state.flash = null;
+    }
+    state.root.replaceChildren(bar, ...notices, state.layout);
+    toggleCheatSheet(!!opts.sheet && !isNarrow()); // auf dem Handy nie von selbst offen
+    window.scrollTo(0, 0);
+  }
+
+  // Tauscht nur den Inhalt, Spickzettel und Kopfzeile bleiben, wie sie sind.
+  function setMain(main, opts = {}) {
+    state.main.replaceChildren(main);
+    if (!opts.keepScroll) window.scrollTo(0, 0);
+  }
+
+  // --- Startseite ---
+
+  function unitRow(id) {
+    const passed = state.store.isPassed(id);
+    const unlocked = state.store.isUnlocked(id);
+    const icon = passed ? '✓' : unlocked ? '▶' : '🔒';
+    const status = passed ? ' (bestanden)' : unlocked ? '' : ' (gesperrt)';
+    const body = [
+      h('span', { class: 'icon', 'aria-hidden': 'true' }, icon),
+      h('span', {},
+        h('div', { class: 'label' }, STAGE_LABEL[id]),
+        h('div', { class: 'title' }, Content.unitTitles[id], h('span', { class: 'sr' }, status))),
+    ];
+    return h('li', {}, unlocked
+      ? h('a', { class: 'unit ' + (passed ? 'passed' : 'open'), href: '#/unit/' + id }, body)
+      : h('div', { class: 'unit locked', 'aria-disabled': 'true' }, body));
+  }
+
+  function renderHome() {
+    const botTile = h('li', {}, state.store.isTableUnlocked()
+      ? h('a', { class: 'unit open', href: '#/table' },
+        h('span', { class: 'icon', 'aria-hidden': 'true' }, '♠'),
+        h('span', {}, h('div', { class: 'label' }, 'Neu'), h('div', { class: 'title' }, 'Bot-Tisch mit Coach')))
+      : h('div', { class: 'unit locked', 'aria-disabled': 'true' },
+        h('span', { class: 'icon', 'aria-hidden': 'true' }, '🔒'),
+        h('span', {}, h('div', { class: 'label' }, 'Bot-Tisch'), h('div', { class: 'title' }, 'Schließe Stufe 2 ab, dann schaltet sich der Tisch frei'))));
+    const reset = h('button', {
+      class: 'btn ghost',
+      type: 'button',
+      onclick: () => {
+        if (window.confirm('Willst du deinen Fortschritt wirklich zurücksetzen?')) {
+          state.store.reset();
+          renderHome();
+        }
+      },
+    }, 'Fortschritt zurücksetzen');
+    show(h('div', {},
+      h('h1', {}, 'Texas Hold\'em lernen'),
+      h('p', { class: 'lead' }, 'Schritt für Schritt von null. Hast du in einer Runde mindestens 80 % richtig, schaltet sich die nächste Stufe frei.'),
+      h('ol', { class: 'path' }, Prog.UNIT_ORDER.map(unitRow), botTile),
+      ui.renderBackup ? ui.renderBackup() : null,
+      h('div', { class: 'footer-actions' }, reset)), { sheet: false });
+  }
+
+  // --- Einheiten und Routing ---
+
+  function runUnit(unitId) {
+    const run = unitRunners[unitId];
+    if (run) {
+      run(unitId);
+      return;
+    }
+    show(h('div', { class: 'panel' },
+      h('h2', {}, Content.unitTitles[unitId]),
+      h('p', {}, 'Diese Einheit ist noch nicht fertig.'),
+      h('a', { class: 'btn', href: '#/' }, 'Zurück zur Übersicht')), { back: true });
+  }
+
+  function route() {
+    const m = /^#\/unit\/([\w-]+)$/.exec(window.location.hash);
+    if (m && Prog.UNIT_ORDER.includes(m[1]) && state.store.isUnlocked(m[1])) {
+      runUnit(m[1]);
+      return;
+    }
+    if (window.location.hash === '#/table' && state.store.isTableUnlocked() && ui.openTable) {
+      ui.openTable();
+      return;
+    }
+    if (window.location.hash && window.location.hash !== '#/') window.history.replaceState(null, '', '#/');
+    renderHome();
+  }
+
+  function start(root, deps) {
+    state.root = root;
+    state.rng = deps.rng;
+    state.store = Prog.createProgressStore(deps.storage);
+    window.addEventListener('hashchange', route);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isNarrow() && state.sheet && !state.sheet.hidden) toggleCheatSheet(false);
+    });
+    route();
+  }
+
+  Object.assign(ui, { h, state, unitRunners, renderCard, renderCards, show, setMain, toggleCheatSheet, runUnit, start, renderHome });
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-ui-round">
+// Bausteine für Lektionen und Runden: Fortschrittsbalken, Ergebnisseite, Ansicht.
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+
+  function progressBar(label, done, total) {
+    return h('div', { class: 'progress' },
+      h('span', {}, label),
+      h('div', { class: 'bar' }, h('span', { style: `width: ${Math.round((done / total) * 100)}%` })));
+  }
+
+  function button(label, onclick, className) {
+    return h('button', { class: className || 'btn', type: 'button', onclick }, label);
+  }
+
+  // Liefert render(main): beim ersten Aufruf wird die Seite gebaut, danach nur der Inhalt getauscht.
+  function makeView(opts) {
+    let shown = false;
+    return function render(main, options) {
+      if (!shown) {
+        ui.show(main, opts);
+        shown = true;
+      } else {
+        ui.setMain(main, options);
+      }
+    };
+  }
+
+  // Speichert das Ergebnis und zeigt es. retry: wird bei „Nochmal“ aufgerufen.
+  function showRoundResult(unitId, correct, total, retry) {
+    const { passed } = ui.state.store.finishRound(unitId, correct, total);
+    const needed = Math.ceil(total * 0.8);
+    ui.show(h('div', { class: 'panel' },
+      h('h2', { class: 'lesson-title' }, passed ? 'Geschafft!' : 'Noch nicht ganz'),
+      h('div', { class: 'result-big' }, `${correct} von ${total}`),
+      h('p', { class: 'lead' }, passed
+        ? 'Das reicht für die nächste Stufe.'
+        : `Du brauchst mindestens ${needed} von ${total} richtig. Probier es gleich noch einmal.`),
+      h('div', { class: 'actions' },
+        passed ? h('a', { class: 'btn', href: '#/' }, 'Weiter') : null,
+        button(passed ? 'Nochmal üben' : 'Nochmal', retry, passed ? 'btn ghost' : 'btn'),
+        passed ? null : h('a', { class: 'btn ghost', href: '#/' }, 'Zur Übersicht'))), { back: true });
+  }
+
+  // Allgemeine Rundenschleife für Stufe 1–3.
+  // opts: unitId, total, sheet, retry,
+  //   make(index) -> Aufgabe, render(ex, answer) -> {el, reveal(value, result)},
+  //   check(ex, value) -> {correct, explanation}, categoryKeysOf(ex) -> string[]
+  function runRound(opts) {
+    const view = makeView({ back: true, sheet: !!opts.sheet });
+    const store = ui.state.store;
+    let index = 0;
+    let correct = 0;
+    let previous = null;
+
+    function showExercise() {
+      const ex = P.exercises.nextDistinct(() => opts.make(index), previous);
+      previous = ex;
+      const lastOne = index === opts.total - 1;
+      let answered = false;
+      const feedback = h('div', { role: 'status', 'aria-live': 'polite' });
+      const nextBtn = button(lastOne ? 'Ergebnis ansehen' : 'Weiter', () => {
+        if (lastOne) {
+          showRoundResult(opts.unitId, correct, opts.total, opts.retry);
+        } else {
+          index++;
+          showExercise();
+        }
+      });
+      nextBtn.hidden = true;
+
+      const exercise = opts.render(ex, (value) => {
+        if (answered) return; // doppelter Klick zählt nicht
+        answered = true;
+        const result = opts.check(ex, value);
+        if (result.correct) correct++;
+        for (const key of opts.categoryKeysOf(ex)) store.recordAnswer(key, result.correct);
+        exercise.reveal(value, result);
+        feedback.replaceChildren(h('div', { class: 'feedback ' + (result.correct ? 'good' : 'bad') },
+          h('strong', {}, result.correct ? 'Richtig! ' : 'Leider falsch. '), result.explanation));
+        nextBtn.hidden = false;
+        nextBtn.focus();
+      });
+
+      view(h('div', { class: 'panel' },
+        progressBar(`Aufgabe ${index + 1} von ${opts.total}`, index + 1, opts.total),
+        exercise.el,
+        feedback,
+        h('div', { class: 'actions' }, nextBtn)));
+    }
+    showExercise();
+  }
+
+  Object.assign(ui, { progressBar, button, makeView, showRoundResult, runRound });
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-stage0">
+// Stufe 0: So läuft eine Runde (Schritte und Quiz).
+(function (P) {
+  const ui = P.ui;
+  const { h, button } = ui;
+  const { stage0Steps, stage0Quiz } = P.content;
+
+  function runSteps(unitId) {
+    const render = ui.makeView({ back: true, sheet: false });
+    function showStep(i) {
+      const step = stage0Steps[i];
+      const last = i === stage0Steps.length - 1;
+      render(h('div', { class: 'panel' },
+        ui.progressBar(`Schritt ${i + 1} von ${stage0Steps.length}`, i + 1, stage0Steps.length),
+        h('h2', { class: 'lesson-title' }, step.title),
+        h('p', {}, step.text),
+        step.extra ? h('div', { class: 'table-label' }, 'Auf dem Tisch') : null,
+        step.example ? ui.renderCards(P.cards.parseCards(step.example)) : null,
+        step.extra ? h('div', { class: 'players' }, step.extra.map((p) => h('div', { class: 'player-box' },
+          h('div', { class: 'table-label' }, p.label),
+          ui.renderCards(P.cards.parseCards(p.cards))))) : null,
+        h('div', { class: 'actions' },
+          i > 0 ? button('Zurück', () => showStep(i - 1), 'btn ghost') : null,
+          button(last ? 'Weiter zum Quiz' : 'Weiter', () => (last ? runQuiz(unitId) : showStep(i + 1))))));
+    }
+    showStep(0);
+  }
+
+  function runQuiz(unitId) {
+    const render = ui.makeView({ back: true, sheet: false });
+    let index = 0;
+    let correct = 0;
+
+    function showQuestion() {
+      const q = stage0Quiz[index];
+      const lastQuestion = index === stage0Quiz.length - 1;
+      let answered = false;
+      const feedback = h('div', { role: 'status', 'aria-live': 'polite' });
+      const next = button(lastQuestion ? 'Ergebnis ansehen' : 'Weiter', () => {
+        if (lastQuestion) ui.showRoundResult(unitId, correct, stage0Quiz.length, runQuiz.bind(null, unitId));
+        else { index++; showQuestion(); }
+      });
+      next.hidden = true;
+
+      const choices = q.options.map((text, i) => h('button', {
+        class: 'choice',
+        type: 'button',
+        onclick: () => {
+          if (answered) return; // doppelter Klick zählt nicht
+          answered = true;
+          const right = i === q.correct;
+          if (right) correct++;
+          choices.forEach((c, j) => {
+            c.disabled = true;
+            if (j === q.correct) c.classList.add('right');
+          });
+          if (!right) choices[i].classList.add('wrong');
+          feedback.replaceChildren(h('div', { class: 'feedback ' + (right ? 'good' : 'bad') },
+            right ? 'Richtig!' : `Leider falsch. Richtig ist: ${q.options[q.correct]}.`));
+          next.hidden = false;
+          next.focus();
+        },
+      }, text));
+
+      render(h('div', { class: 'panel' },
+        ui.progressBar(`Frage ${index + 1} von ${stage0Quiz.length}`, index + 1, stage0Quiz.length),
+        h('div', { class: 'question' }, q.question),
+        h('div', { class: 'choices' }, choices),
+        feedback,
+        h('div', { class: 'actions' }, next)));
+    }
+    showQuestion();
+  }
+
+  ui.unitRunners['stage0'] = runSteps;
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-stage1">
+// Stufe 1: Handränge – Lektionskarten und Prüfrunden („Was ist das?“, „Welche Hand ist stärker?“).
+(function (P) {
+  const ui = P.ui;
+  const { h, button } = ui;
+  const { names: Names, content: Content, exercises: Ex, evaluator: Ev, cards: Cards } = P;
+  const ROUND_SIZE = 10;
+  const ALL = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  // pool: Ränge, die in der Runde vorkommen; focus: Ränge der aktuellen Gruppe (dreifach gewichtet)
+  const SETUP = {
+    'stage1-group1': { pool: [0, 1, 2], focus: [0, 1, 2], sheet: true },
+    'stage1-group2': { pool: [0, 1, 2, 3, 4, 5], focus: [3, 4, 5], sheet: true },
+    'stage1-group3': { pool: ALL, focus: [6, 7, 8, 9], sheet: true },
+    'stage1-final': { pool: ALL, focus: [], sheet: false },
+  };
+
+  // --- Lektionen ---
+
+  function runLessons(unitId) {
+    const group = Content.groups.find((g) => g.id === unitId);
+    const render = ui.makeView({ back: true, sheet: true });
+    function showLesson(i) {
+      const category = group.categories[i];
+      const lesson = Content.rankLessons[category];
+      const last = i === group.categories.length - 1;
+      const cut = lesson.text.indexOf(': ');
+      render(h('div', { class: 'panel' },
+        ui.progressBar(`Karte ${i + 1} von ${group.categories.length}`, i + 1, group.categories.length),
+        h('div', { class: 'muted small' }, `Platz ${10 - category} von 10 (1 ist die stärkste Hand)`),
+        h('p', {}, h('strong', {}, lesson.text.slice(0, cut + 1)), lesson.text.slice(cut + 1)),
+        ui.renderCards(Cards.parseCards(lesson.example)),
+        h('div', { class: 'actions' },
+          i > 0 ? button('Zurück', () => showLesson(i - 1), 'btn ghost') : null,
+          button(last ? 'Weiter zu den Aufgaben' : 'Weiter', () => (last ? startRound(unitId) : showLesson(i + 1))))));
+    }
+    showLesson(0);
+  }
+
+  // --- Aufgaben ---
+
+  function makeExercise(setup, index) {
+    const rng = ui.state.rng;
+    const store = ui.state.store;
+    const weights = setup.pool.map((c) => (setup.focus.includes(c) ? 3 : 1) * store.weightFor('cat' + c));
+    const first = Cards.pickWeighted(setup.pool, weights, rng);
+    if (index % 2 === 0) return { kind: 'identify', ...Ex.makeIdentify(rng, first) };
+    const rest = setup.pool.filter((c) => c !== first);
+    const second = Cards.pickWeighted(rest, rest.map((c) => weights[setup.pool.indexOf(c)]), rng);
+    return { kind: 'stronger', ...Ex.makeStronger(rng, [first, second]) };
+  }
+
+  function renderIdentify(setup, ex, answer) {
+    const options = setup.pool.slice().sort((a, b) => b - a); // stärkste zuerst, wie auf dem Spickzettel
+    const buttons = options.map((c) => h('button', { class: 'choice', type: 'button', onclick: () => answer(c) }, Names.firstMention(c)));
+    return {
+      el: h('div', {},
+        h('div', { class: 'question' }, 'Was ist das für eine Hand?'),
+        ui.renderCards(ex.cards),
+        h('div', { class: 'choices' }, buttons)),
+      reveal(value) {
+        buttons.forEach((b, i) => {
+          b.disabled = true;
+          if (options[i] === ex.category) b.classList.add('right');
+          else if (options[i] === value) b.classList.add('wrong');
+        });
+      },
+    };
+  }
+
+  function renderStronger(ex, answer) {
+    const choice = (side, label, cards) => h('button', { class: 'hand-choice', type: 'button', onclick: () => answer(side) },
+      h('div', { class: 'label' }, label), ui.renderCards(cards));
+    const a = choice('a', 'Hand A', ex.a);
+    const b = choice('b', 'Hand B', ex.b);
+    return {
+      el: h('div', {},
+        h('div', { class: 'question' }, 'Welche Hand ist stärker?'),
+        h('div', { class: 'options-two' }, a, b)),
+      reveal(value) {
+        a.disabled = true;
+        b.disabled = true;
+        const buttons = { a, b };
+        buttons[ex.winner].classList.add('right');
+        if (value !== ex.winner) buttons[value].classList.add('wrong');
+      },
+    };
+  }
+
+  function startRound(unitId) {
+    const setup = SETUP[unitId];
+    ui.runRound({
+      unitId,
+      total: ROUND_SIZE,
+      sheet: setup.sheet,
+      retry: () => startRound(unitId),
+      make: (index) => makeExercise(setup, index),
+      render: (ex, answer) => (ex.kind === 'identify' ? renderIdentify(setup, ex, answer) : renderStronger(ex, answer)),
+      check: (ex, value) => (ex.kind === 'identify'
+        ? { correct: value === ex.category, explanation: `Das ist ${Names.describeHandDe(Ev.evaluate5(ex.cards))}.` }
+        : { correct: value === ex.winner, explanation: Names.explainComparison(Ev.evaluate5(ex.a), Ev.evaluate5(ex.b)) }),
+      categoryKeysOf: (ex) => (ex.kind === 'identify'
+        ? ['cat' + ex.category]
+        : [Ev.evaluate5(ex.a).category, Ev.evaluate5(ex.b).category].map((c) => 'cat' + c)),
+    });
+  }
+
+  for (const group of Content.groups) ui.unitRunners[group.id] = runLessons;
+  ui.unitRunners['stage1-final'] = startRound;
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-stage23">
+// Stufe 2: beste fünf aus sieben. Stufe 3: wer gewinnt?
+(function (P) {
+  const ui = P.ui;
+  const { h, button } = ui;
+  const { names: Names, content: Content, exercises: Ex, evaluator: Ev } = P;
+  const ROUND_SIZE = 10;
+
+  const listDe = (items) => (items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} und ${items[items.length - 1]}`);
+
+  function showIntro(unitId, text, startRound) {
+    ui.makeView({ back: true, sheet: false })(h('div', { class: 'panel' },
+      h('h2', { class: 'lesson-title' }, Content.unitTitles[unitId]),
+      h('p', {}, text),
+      h('div', { class: 'actions' }, button('Los geht\'s', startRound))));
+  }
+
+  // --- Stufe 2 ---
+
+  function renderBest5(ex, answer) {
+    const picked = new Set();
+    const buttons = ex.seven.map((card, i) => h('button', {
+      class: 'card-btn',
+      type: 'button',
+      'aria-pressed': 'false',
+      onclick: () => toggle(i),
+    }, ui.renderCard(card, i < 2 ? 'hole' : '')));
+    const counter = h('div', { class: 'muted', role: 'status' }, 'Gewählt: 0 von 5');
+    const check = button('Prüfen', () => answer([...picked].sort((a, b) => a - b)));
+    check.disabled = true;
+
+    function toggle(i) {
+      if (picked.has(i)) {
+        picked.delete(i);
+      } else if (picked.size < 5) {
+        picked.add(i);
+      } else {
+        counter.textContent = 'Du hast schon fünf Karten gewählt. Tippe eine an, um sie abzuwählen.';
+        return;
+      }
+      buttons[i].firstChild.classList.toggle('selected', picked.has(i));
+      buttons[i].setAttribute('aria-pressed', String(picked.has(i)));
+      counter.textContent = `Gewählt: ${picked.size} von 5`;
+      check.disabled = picked.size !== 5;
+    }
+
+    return {
+      el: h('div', {},
+        h('div', { class: 'question' }, 'Welche fünf Karten bilden deine beste Hand?'),
+        h('div', { class: 'table-label' }, 'Deine Karten'),
+        h('div', { class: 'hand' }, buttons.slice(0, 2)),
+        h('div', { class: 'table-label' }, 'Auf dem Tisch'),
+        h('div', { class: 'hand' }, buttons.slice(2)),
+        h('div', { class: 'actions' }, counter, check)),
+      reveal() {
+        const best = new Set(Ev.bestOf7(ex.seven).best5.map((c) => ex.seven.indexOf(c)));
+        buttons.forEach((b, i) => {
+          b.disabled = true;
+          const card = b.firstChild;
+          if (best.has(i)) card.classList.add('best');
+          else if (!picked.has(i)) card.classList.add('dim');
+        });
+        check.disabled = true;
+        counter.textContent = 'Grün: die besten fünf Karten. Gold: deine Wahl, die nicht dazugehört.';
+      },
+    };
+  }
+
+  function startBest5(unitId) {
+    ui.runRound({
+      unitId,
+      total: ROUND_SIZE,
+      sheet: false,
+      retry: () => startBest5(unitId),
+      make: () => Ex.makeBest5(ui.state.rng),
+      render: renderBest5,
+      check: (ex, picked) => {
+        const r = Ex.checkBest5(ex, picked);
+        return {
+          correct: r.correct,
+          explanation: r.correct
+            ? `Das ist ${Names.describeHandDe(r.best)}.`
+            : `Deine fünf Karten ergeben ${Names.describeHandDe(r.picked)}. Die beste Hand ist ${Names.describeHandDe(r.best)}.`,
+        };
+      },
+      categoryKeysOf: () => ['best5'],
+    });
+  }
+
+  // --- Stufe 3 ---
+
+  function explainWinners(ex) {
+    const { winners, values } = ex;
+    if (winners.length > 1) {
+      return `${listDe(winners.map((i) => `Spieler ${i + 1}`))} haben dieselbe Hand: ${Names.describeHandDe(values[winners[0]])}. ` +
+        Names.explainComparison(values[winners[0]], values[winners[1]]);
+    }
+    const w = winners[0];
+    const bestOther = values.filter((_, i) => i !== w).reduce((a, b) => (Ev.compareValues(a, b) >= 0 ? a : b));
+    const sameMainRank = values[w].category === bestOther.category && values[w].tiebreak[0] === bestOther.tiebreak[0];
+    // Bei verschiedenem Rang nennt der Vergleich beide Hände schon selbst.
+    return sameMainRank
+      ? `Spieler ${w + 1} gewinnt mit ${Names.describeHandDe(values[w])}. ${Names.explainComparison(values[w], bestOther)}`
+      : `Spieler ${w + 1} gewinnt. ${Names.explainComparison(values[w], bestOther)}`;
+  }
+
+  function renderWinner(ex, answer) {
+    const chosen = new Set();
+    const players = ex.hands.map((hand, i) => {
+      const label = h('div', { class: 'label' }, `Spieler ${i + 1}`);
+      const el = h('button', { class: 'player hand-choice', type: 'button', 'aria-pressed': 'false', onclick: () => toggle(i) },
+        label, ui.renderCards(hand));
+      return { el, label };
+    });
+    const confirm = button('Bestätigen', () => answer([...chosen].sort((a, b) => a - b)));
+    confirm.disabled = true;
+
+    function toggle(i) {
+      if (chosen.has(i)) chosen.delete(i);
+      else chosen.add(i);
+      players[i].el.classList.toggle('selected', chosen.has(i));
+      players[i].el.setAttribute('aria-pressed', String(chosen.has(i)));
+      confirm.disabled = chosen.size === 0;
+    }
+
+    return {
+      el: h('div', {},
+        h('div', { class: 'question' }, 'Wer gewinnt?'),
+        h('p', { class: 'muted small', style: 'text-align: center; margin-top: 0' }, 'Tippe alle Spieler an, die gewinnen – bei Gleichstand mehrere.'),
+        h('div', { class: 'table-label' }, 'Auf dem Tisch'),
+        ui.renderCards(ex.board),
+        h('div', { class: 'players' }, players.map((p) => p.el)),
+        h('div', { class: 'actions' }, confirm)),
+      reveal() {
+        confirm.disabled = true;
+        players.forEach((p, i) => {
+          p.el.disabled = true;
+          p.el.classList.remove('selected');
+          if (ex.winners.includes(i)) p.el.classList.add('right');
+          else if (chosen.has(i)) p.el.classList.add('wrong');
+          p.label.textContent = `Spieler ${i + 1}: ${Names.describeHandDe(ex.values[i])}`;
+        });
+      },
+    };
+  }
+
+  function startWinner(unitId) {
+    ui.runRound({
+      unitId,
+      total: ROUND_SIZE,
+      sheet: false,
+      retry: () => startWinner(unitId),
+      make: (index) => Ex.makeWinner(ui.state.rng, index % 3 === 2 ? 3 : 2), // Aufgaben 3, 6, 9 mit drei Spielern
+      render: renderWinner,
+      check: (ex, chosen) => ({
+        correct: chosen.length === ex.winners.length && chosen.every((v, i) => v === ex.winners[i]),
+        explanation: explainWinners(ex),
+      }),
+      categoryKeysOf: () => ['winner'],
+    });
+  }
+
+  ui.unitRunners['stage2'] = (id) => showIntro(id, Content.stage23Intro.stage2, () => startBest5(id));
+  ui.unitRunners['stage3'] = (id) => showIntro(id, Content.stage23Intro.stage3, () => startWinner(id));
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-stage4">
+// Stufe 4 „Besser spielen“: Erklärkarten und Prüfrunden zu Startkarten, Position, Outs und Pot Odds.
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const { content: Content, exercises: Ex, analysis: An } = P;
+  const { parseCards } = P.cards;
+  const ROUND_SIZE = 10;
+  const SEAT_NAMES = ['Du', 'Anna', 'Ben', 'Clara'];
+  const weightOf = (key) => ui.state.store.weightFor(key);
+
+  // „AKs“, „QQ“, „72o“ aus zwei Karten
+  function handLabel(cards) {
+    const [a, b] = cards[0].rank >= cards[1].rank ? cards : [cards[1], cards[0]];
+    const ch = { 14: 'A', 13: 'K', 12: 'Q', 11: 'J', 10: 'T' };
+    const r = (rank) => ch[rank] || String(rank);
+    return a.rank === b.rank ? r(a.rank) + r(b.rank) : r(a.rank) + r(b.rank) + (a.suit === b.suit ? 's' : 'o');
+  }
+
+  function groupExamples(groups) {
+    return h('div', { class: 'example-groups' }, groups.map((g) => h('div', { class: 'example-row' },
+      h('span', { class: 'group-chip g-' + g }, An.GROUP_NAME_DE[g]),
+      h('span', {}, Content.stage4.startExamples[g].map((hand) => handLabel(parseCards(hand))).join(', ')))));
+  }
+
+  // --- Erklärkarten ---
+
+  function runLessons(unitId) {
+    const cards = Content.stage4.lessons[unitId];
+    const render = ui.makeView({ back: true, sheet: unitId === 'stage4-start' }); // die Startkarten-Tabelle ist hier offen
+    function showCard(i) {
+      const c = cards[i];
+      const last = i === cards.length - 1;
+      render(h('div', { class: 'panel' },
+        ui.progressBar(`Karte ${i + 1} von ${cards.length}`, i + 1, cards.length),
+        h('h2', { class: 'lesson-title' }, c.title),
+        h('p', {}, c.text),
+        c.example && !c.board ? ui.renderCards(parseCards(c.example)) : null,
+        c.example && c.board ? h('div', {},
+          h('div', { class: 'table-label' }, 'Deine Karten'), ui.renderCards(parseCards(c.example)),
+          h('div', { class: 'table-label' }, 'Auf dem Tisch'), ui.renderCards(parseCards(c.board))) : null,
+        c.groups ? groupExamples(c.groups) : null,
+        c.id === 'tabelle' ? h('div', { class: 'actions' }, ui.button('Spickzettel öffnen', () => ui.toggleCheatSheet(true), 'btn ghost only-phone')) : null,
+        h('div', { class: 'actions' },
+          i > 0 ? ui.button('Zurück', () => showCard(i - 1), 'btn ghost') : null,
+          ui.button(last ? 'Weiter zu den Aufgaben' : 'Weiter', () => (last ? startRound(unitId) : showCard(i + 1))))));
+    }
+    showCard(0);
+  }
+
+  // --- Aufgaben ---
+
+  // Markiert nach der Antwort die richtige und eine falsch gewählte Antwort.
+  function mark(buttons, values, correct, picked) {
+    buttons.forEach((b, i) => {
+      b.disabled = true;
+      if (values[i] === correct) b.classList.add('right');
+      else if (values[i] === picked) b.classList.add('wrong');
+    });
+  }
+
+  function choiceButtons(options, answer) {
+    return options.map(([value, label]) => h('button', { class: 'choice', type: 'button', onclick: () => answer(value) }, label));
+  }
+
+  const flopOrTurn = (boardLength) => (boardLength === 3 ? 'Flop' : 'Turn');
+
+  const ROUNDS = {
+    'stage4-start': {
+      make: () => Ex.makeStartHand(ui.state.rng, weightOf),
+      render: (ex, answer) => {
+        const options = [['spielen', 'Spielen'], ['weglegen', 'Weglegen']];
+        const buttons = choiceButtons(options, answer);
+        const situation = `${ex.onButton ? 'Du bist am Button.' : 'Du bist nicht am Button.'} ${ex.facingRaise ? 'Jemand hat vor dir erhöht.' : 'Noch niemand hat erhöht.'}`;
+        return {
+          el: h('div', {}, h('div', { class: 'question' }, 'Spielen oder weglegen?'), ui.renderCards(ex.hole),
+            h('p', { class: 'info-lines' }, situation), h('div', { class: 'choices' }, buttons)),
+          reveal: (value) => mark(buttons, options.map((o) => o[0]), ex.answer, value),
+        };
+      },
+      check: (ex, value) => ({ correct: value === ex.answer, explanation: An.explainStartHand(ex.hole, ex) }),
+      keys: (ex) => ['start-' + ex.group],
+    },
+    'stage4-position': {
+      make: () => Ex.makePositionTask(ui.state.rng, weightOf),
+      render: (task, answer) => {
+        const strip = h('div', { class: 'seat-strip' }, SEAT_NAMES.map((name, i) => h('span', {
+          class: task.kind === 'class' && i === task.seat ? 'asked' : '',
+        }, name + (i === task.button ? ' · Button' : ''))));
+        if (task.kind === 'class') {
+          const options = [['früh', 'Früh'], ['spät', 'Spät']];
+          const buttons = choiceButtons(options, answer);
+          const who = task.seat === 0 ? 'Bist du' : `Ist ${SEAT_NAMES[task.seat]}`;
+          return {
+            el: h('div', {}, h('div', { class: 'question' }, `${who} früh oder spät?`), strip, h('div', { class: 'choices' }, buttons)),
+            reveal: (value) => mark(buttons, options.map((o) => o[0]), task.answer, value),
+          };
+        }
+        const options = SEAT_NAMES.map((name, i) => [i, name + (i === task.button ? ' · Button' : '')]);
+        const buttons = choiceButtons(options, answer);
+        return {
+          el: h('div', {}, h('div', { class: 'question' }, `Wer handelt nach dem Flop ${task.kind === 'last' ? 'zuletzt' : 'zuerst'}?`),
+            h('p', { class: 'muted small info-lines' }, 'Alle vier Spieler sind noch dabei.'), h('div', { class: 'choices' }, buttons)),
+          reveal: (value) => mark(buttons, options.map((o) => o[0]), task.answer, value),
+        };
+      },
+      check: (task, value) => ({ correct: value === task.answer, explanation: Ex.explainPosition(task) }),
+      keys: (task) => ['position-' + task.kind],
+    },
+    'stage4-outs': {
+      make: () => Ex.makeOutsTask(ui.state.rng, weightOf),
+      render: (task, answer) => {
+        const options = task.options.map((n) => [n, `${n} Outs`]);
+        const buttons = choiceButtons(options, answer);
+        return {
+          el: h('div', {}, h('div', { class: 'question' }, 'Wie viele Outs hast du?'),
+            h('div', { class: 'table-label' }, 'Deine Karten'), ui.renderCards(task.hole),
+            h('div', { class: 'table-label' }, 'Auf dem Tisch'), ui.renderCards(task.board),
+            h('div', { class: 'choices' }, buttons)),
+          reveal: (value) => mark(buttons, task.options, task.outs, value),
+        };
+      },
+      check: (task, value) => ({ correct: value === task.outs, explanation: Ex.explainOuts(task) }),
+      keys: (task) => ['outs-' + task.drawKind],
+    },
+    'stage4-odds': {
+      make: (index) => Ex.makeOddsTask(ui.state.rng, index % 2 === 0 ? 'chance' : 'call'),
+      render: (task, answer) => {
+        if (task.kind === 'chance') {
+          const buttons = choiceButtons(task.options.map((n) => [n, `${n} %`]), answer);
+          return {
+            el: h('div', {}, h('div', { class: 'question' }, `Wie groß ist die Chance bei ${task.outs} Outs nach dem ${flopOrTurn(task.boardLength)}?`),
+              h('div', { class: 'choices' }, buttons)),
+            reveal: (value) => mark(buttons, task.options, task.answer, value),
+          };
+        }
+        const options = [['call', 'Call'], ['fold', 'Fold']];
+        const buttons = choiceButtons(options, answer);
+        return {
+          el: h('div', {}, h('div', { class: 'question' }, 'Lohnt sich der Call?'),
+            h('p', { class: 'info-lines' }, `Im Pot liegen ${task.pot} Chips (mit dem Einsatz deines Gegners).`),
+            h('p', { class: 'info-lines' }, `Du musst ${task.toCall} Chips zahlen.`),
+            h('p', { class: 'info-lines' }, `Du hast ${task.outs} Outs, nach dem ${flopOrTurn(task.boardLength)}.`),
+            h('div', { class: 'choices' }, buttons)),
+          reveal: (value) => mark(buttons, options.map((o) => o[0]), task.answer, value),
+        };
+      },
+      check: (task, value) => ({ correct: value === task.answer, explanation: Ex.explainOdds(task) }),
+      keys: (task) => ['odds-' + task.kind],
+    },
+  };
+
+  function startRound(unitId) {
+    const spec = ROUNDS[unitId];
+    ui.runRound({
+      unitId,
+      total: ROUND_SIZE,
+      sheet: false, // in Prüfrunden zu Beginn geschlossen, per Knopf erreichbar
+      retry: () => startRound(unitId),
+      make: (index) => spec.make(index),
+      render: spec.render,
+      check: spec.check,
+      categoryKeysOf: spec.keys,
+    });
+  }
+
+  for (const unitId of Object.keys(ROUNDS)) ui.unitRunners[unitId] = runLessons;
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-backup">
+// „Fortschritt sichern“ auf der Startseite: Code kopieren, Code einfügen (mit Vorschau und Bestätigung).
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const { encodeBackup, decodeBackup, describeBackup } = P.backup;
+
+  // Eingabefeld mit mindestens 16 px Schrift (CSS), damit iOS beim Antippen nicht zoomt.
+  function codeBox(label, readOnly) {
+    return h('textarea', {
+      class: 'code-box', rows: '4', 'aria-label': label, readonly: readOnly, autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off', spellcheck: 'false',
+    });
+  }
+
+  function renderBackup() {
+    const store = ui.state.store;
+    const area = h('div', { class: 'backup-area' }); // Platz für Code-Feld, Meldung und Vorschau
+
+    function showCopy() {
+      const box = codeBox('Dein Code', true);
+      box.value = encodeBackup(store.exportState());
+      const message = h('p', { class: 'muted small', role: 'status' });
+      area.replaceChildren(box, message);
+      box.focus();
+      box.setSelectionRange(0, box.value.length);
+      const fallback = () => { message.textContent = 'Markiere den Text und kopiere ihn selbst.'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(box.value).then(
+          () => { message.textContent = 'Kopiert. Füge den Code auf dem anderen Gerät bei „Code einfügen“ ein.'; },
+          fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function showPaste() {
+      const box = codeBox('Code einfügen', false);
+      const message = h('p', { class: 'small', role: 'alert' });
+      const preview = h('div', {});
+      box.addEventListener('input', () => { preview.replaceChildren(); message.textContent = ''; });
+
+      function replace(state) {
+        try {
+          store.importState(state);
+        } catch (e) {
+          message.textContent = 'Dieser Code passt nicht. Hast du ihn ganz kopiert?';
+          return;
+        }
+        ui.state.flash = 'Fortschritt übernommen.';
+        ui.renderHome();
+      }
+
+      function verify() {
+        preview.replaceChildren();
+        const result = decodeBackup(box.value);
+        if (!result.ok) {
+          message.textContent = result.reason === 'leer' ? 'Füge zuerst deinen Code ein.' : 'Dieser Code passt nicht. Hast du ihn ganz kopiert?';
+          return;
+        }
+        message.textContent = '';
+        preview.append(
+          h('p', {}, describeBackup(result.state)),
+          h('p', { class: 'muted small' }, 'Dein jetziger Fortschritt wird dadurch ersetzt.'),
+          h('div', { class: 'actions' },
+            ui.button('Ersetzen', () => replace(result.state)),
+            ui.button('Abbrechen', () => area.replaceChildren(), 'btn ghost')));
+      }
+
+      area.replaceChildren(box, h('div', { class: 'actions' }, ui.button('Prüfen', verify)), message, preview);
+      box.focus();
+    }
+
+    return h('section', { class: 'panel backup', 'aria-labelledby': 'backup-title' },
+      h('h2', { id: 'backup-title' }, 'Fortschritt sichern'),
+      h('p', { class: 'muted' }, 'Dein Fortschritt liegt nur in diesem Browser. Mit einem Code nimmst du ihn aufs iPhone mit oder sicherst ihn für den Notfall.'),
+      h('div', { class: 'actions' }, ui.button('Code kopieren', showCopy, 'btn ghost'), ui.button('Code einfügen', showPaste, 'btn ghost')),
+      area);
+  }
+
+  ui.renderBackup = renderBackup;
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-table">
+// Bot-Tisch: Zeichnen des Tisches und (später) der Spielablauf.
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const STREET_DE = { preflop: 'Preflop', flop: 'Flop', turn: 'Turn', river: 'River', showdown: 'Showdown', done: 'Ende der Hand' };
+
+  function renderCardBack() {
+    return h('div', { class: 'card back', role: 'img', 'aria-label': 'verdeckte Karte' });
+  }
+
+  function badges(hand, seat) {
+    const marks = [];
+    if (seat === hand.button) marks.push('D');
+    if (seat === (hand.button + 1) % hand.n) marks.push('SB');
+    if (seat === (hand.button + 2) % hand.n) marks.push('BB');
+    return marks.map((m) => h('span', { class: 'badge' }, m));
+  }
+
+  // opts.showAll deckt alle Karten auf, opts.reveal ist eine Liste von Sitzen, die ihre Karten zeigen.
+  function renderSeat(hand, seat, opts) {
+    const p = hand.players[seat];
+    const faceUp = seat === 0 || opts.showAll || (opts.reveal || []).includes(seat);
+    const showCards = seat === 0 || !p.folded;
+    return h('div', { class: 'seat' + (seat === 0 ? ' me' : '') + (seat === hand.toAct ? ' turn' : '') + (p.folded ? ' folded' : '') },
+      h('div', { class: 'seat-head' }, h('strong', {}, p.name), badges(hand, seat)),
+      h('div', { class: 'seat-stack' }, `${p.stack} Chips`),
+      h('div', { class: 'seat-bet' }, p.bet > 0 ? `Einsatz ${p.bet}` : ''),
+      h('div', { class: 'seat-status' }, p.folded ? 'Fold' : p.allIn ? 'All-in' : ''),
+      showCards ? h('div', { class: 'hand' }, p.cards.map((c) => (faceUp ? ui.renderCard(c) : renderCardBack()))) : null);
+  }
+
+  function renderTable(hand, opts = {}) {
+    const pot = hand.players.reduce((sum, p) => sum + p.total, 0);
+    const visible = opts.boardCount === undefined ? hand.board.length : opts.boardCount; // so viele Board-Karten zeigen
+    const slots = [];
+    for (let i = 0; i < 5; i++) slots.push(i < visible && hand.board[i] ? ui.renderCard(hand.board[i]) : h('div', { class: 'card slot' }));
+    const others = [];
+    for (let seat = 1; seat < hand.n; seat++) others.push(renderSeat(hand, seat, opts));
+    return h('div', { class: 'poker-table' },
+      h('div', { class: 'opponents' }, others),
+      h('div', { class: 'table-center' },
+        h('div', { class: 'street-label' }, STREET_DE[hand.street]),
+        h('div', { class: 'hand' }, slots),
+        h('div', { class: 'pot' }, `Pot: ${pot} Chips`)),
+      renderSeat(hand, 0, opts),
+      h('p', { class: 'muted small table-legend' }, 'D = Button, SB = Small Blind, BB = Big Blind. All-in heißt: alle deine Chips setzen.'));
+  }
+
+  // --- Spielablauf ---
+
+  const { hand: Hand, session: Session, bots: Bots, coach: Coach } = P;
+  let currentCtl = null; // der laufende Tisch; ältere Läufe hören auf, sobald ein neuer beginnt oder die Seite wechselt
+  const alive = (ctl) => currentCtl === ctl && window.location.hash === '#/table';
+
+  function describeEntry(hand, e) {
+    const name = hand.players[e.seat].name;
+    const me = e.seat === 0;
+    const allIn = e.allIn ? ' – All-in!' : '';
+    switch (e.type) {
+      case 'smallBlind': return `${name} setzt den Small Blind (${e.to}).`;
+      case 'bigBlind': return `${name} setzt den Big Blind (${e.to}).`;
+      case 'fold': return `${name} ${me ? 'gibst' : 'gibt'} auf.`;
+      case 'check': return `${name} ${me ? 'checkst' : 'checkt'}.`;
+      case 'call': return `${name} ${me ? 'gehst' : 'geht'} mit (${e.to})${allIn}.`;
+      case 'bet': return `${name} setzt ${e.to}${allIn}.`;
+      default: return `${name} ${me ? 'erhöhst' : 'erhöht'} auf ${e.to}${allIn}.`;
+    }
+  }
+
+  function announce(ctl) {
+    for (; ctl.logCursor < ctl.hand.log.length; ctl.logCursor++) ctl.log.push(describeEntry(ctl.hand, ctl.hand.log[ctl.logCursor]));
+  }
+
+  function buildRaisePanel(ctl, view, legal) {
+    const sizes = Hand.raiseSizes(view);
+    const verb = view.currentBet === 0 ? 'Setzen' : 'Erhöhen';
+    const aligned = legal.minRaiseTo % 10 === 0 && legal.maxRaiseTo % 10 === 0;
+    let current = sizes.half;
+    const slider = h('input', {
+      type: 'range', min: legal.minRaiseTo, max: legal.maxRaiseTo, step: aligned ? 10 : 1, 'aria-label': `${verb} auf …`,
+    });
+    const confirm = ui.button('', () => humanAct(ctl, { type: 'raise', to: current }));
+    const update = (value) => {
+      current = Math.max(legal.minRaiseTo, Math.min(legal.maxRaiseTo, value));
+      slider.value = String(current);
+      confirm.textContent = `${verb} auf ${current}${current === legal.maxRaiseTo ? ' (All-in)' : ''}`;
+    };
+    slider.addEventListener('input', () => update(Number(slider.value)));
+    const preset = (label, value) => ui.button(label, () => update(value), 'btn ghost');
+    update(current);
+    return h('div', { class: 'raise-panel', hidden: true },
+      h('div', { class: 'actions' }, preset('Min', sizes.min), preset('½ Pot', sizes.half), preset('Pot', sizes.pot), preset('All-in', sizes.allIn)),
+      slider,
+      h('div', { class: 'actions' }, confirm));
+  }
+
+  // Coach-Kästen: die Hilfe vor einer Entscheidung und die Rückschau nach der Hand.
+  function renderHintBox(view) {
+    return h('div', { class: 'coach-box', role: 'status' }, h('strong', {}, 'Coach: '), Coach.hintFor(view, ui.state.store.learnedTopics()));
+  }
+
+  // Der erste Satz der Rückschau (wer gewinnt) steht schon im Ergebnis; hier stehen die weiteren Sätze.
+  function renderReviewBox(hand) {
+    const lines = Coach.reviewHand(hand, 0, ui.state.store.learnedTopics()).slice(1);
+    return lines.length ? h('div', { class: 'coach-box' }, h('strong', {}, 'Coach'), lines.map((line) => h('p', {}, line))) : null;
+  }
+
+  // Handy: die angeheftete Aktionsleiste darf die eigenen Karten nicht verdecken – bei Bedarf so weit scrollen, dass beides zu sehen ist.
+  function keepOwnCardsVisible() {
+    const bar = document.querySelector('.action-bar');
+    const me = document.querySelector('.seat.me');
+    if (!bar || !me || window.getComputedStyle(bar).position !== 'sticky') return;
+    const overlap = me.getBoundingClientRect().bottom - bar.getBoundingClientRect().top;
+    if (overlap > 0) window.scrollBy(0, overlap + 12);
+  }
+
+  function buildActions(ctl) {
+    const hand = ctl.hand;
+    const view = Hand.viewFor(hand, 0);
+    const legal = Hand.legalActions(hand);
+    const callLabel = legal.callAmount >= view.stack ? `Call (All-in ${legal.callAmount})` : `Call ${legal.callAmount}`;
+    const hintSlot = h('div', {});
+    const row = h('div', { class: 'actions' },
+      ui.button('Fold', () => humanAct(ctl, { type: 'fold' }), 'btn ghost'),
+      legal.canCheck ? ui.button('Check', () => humanAct(ctl, { type: 'check' })) : ui.button(callLabel, () => humanAct(ctl, { type: 'call' })));
+    let panel = null;
+    if (legal.canRaise) {
+      panel = buildRaisePanel(ctl, view, legal);
+      row.append(ui.button(view.currentBet === 0 ? 'Setzen …' : 'Erhöhen …', () => { panel.hidden = !panel.hidden; keepOwnCardsVisible(); }));
+    }
+    if (ctl.table.coach) row.append(ui.button('Hilfe', () => { hintSlot.replaceChildren(renderHintBox(view)); keepOwnCardsVisible(); }, 'btn ghost'));
+    const info = legal.toCall > 0 ? `Du bist dran. Zum Mitgehen: ${legal.callAmount} Chips. Pot: ${view.pot}.` : `Du bist dran. Du kannst checken. Pot: ${view.pot}.`;
+    return h('div', { class: 'panel action-bar' }, h('div', { class: 'muted' }, info), row, hintSlot, panel);
+  }
+
+  function buildResult(ctl) {
+    const hand = ctl.hand;
+    const reveal = Coach.revealLine(hand);
+    const sidePot = Coach.sidePotNote(hand);
+    return h('div', { class: 'panel result' },
+      h('h2', { class: 'lesson-title' }, 'Ergebnis'),
+      Coach.resultLines(hand).map((line) => h('p', {}, line)),
+      reveal ? h('p', { class: 'muted small' }, reveal) : null,
+      h('p', { class: 'muted' }, Coach.netLine(hand)),
+      sidePot ? h('p', { class: 'muted small' }, sidePot) : null,
+      ctl.table.coach ? renderReviewBox(hand) : null,
+      h('div', { class: 'actions' }, ui.button('Nächste Hand', () => startNextHand(ctl))));
+  }
+
+  function draw(ctl) {
+    const hand = ctl.hand;
+    const over = hand.street === 'done';
+    const reveal = over && hand.result.showdown ? hand.result.revealOrder : [];
+    ctl.canAct = !over && hand.toAct === 0;
+    const screen = h('div', {},
+      h('h1', {}, 'Bot-Tisch'),
+      h('div', { class: 'table-head' },
+        h('span', { class: 'muted small' }, `Hand ${ctl.table.hands + (over ? 0 : 1)}`),
+        h('button', {
+          class: 'btn ghost small', type: 'button', 'aria-pressed': String(ctl.table.coach), onclick: () => toggleCoach(ctl),
+        }, ctl.table.coach ? 'Coach: an' : 'Coach: aus')),
+      renderTable(hand, { reveal, boardCount: over ? hand.board.length : ctl.shown }),
+      over ? buildResult(ctl) : ctl.canAct && ctl.shown === hand.board.length ? buildActions(ctl) : null,
+      h('div', { class: 'log', 'aria-label': 'Verlauf' }, ctl.log.slice(-6).map((line) => h('div', {}, line))));
+    ctl.render(screen, { keepScroll: true });
+    if (ctl.canAct) keepOwnCardsVisible();
+  }
+
+  // Der Schalter wird sofort gespeichert; die Stacks sind dabei die der letzten fertigen Hand.
+  function toggleCoach(ctl) {
+    ctl.table = { ...ctl.table, coach: !ctl.table.coach };
+    ui.state.store.saveTable(ctl.table);
+    draw(ctl);
+  }
+
+  function drawBust(ctl) {
+    ctl.render(h('div', {},
+      h('h1', {}, 'Bot-Tisch'),
+      h('div', { class: 'panel' },
+        h('h2', { class: 'lesson-title' }, 'Du hast keine Chips mehr.'),
+        h('p', {}, 'Die Bots spielen mit ihren Chips weiter. Du kannst mit frischen 1000 Chips neu starten.'),
+        h('div', { class: 'actions' }, ui.button('Neu starten mit 1000 Chips', () => {
+          ctl.table = Session.restartHuman(ctl.table);
+          ui.state.store.saveTable(ctl.table);
+          startNextHand(ctl);
+        })))), { keepScroll: true });
+  }
+
+  function applyAndLog(ctl, action) {
+    ctl.hand = Hand.applyAction(ctl.hand, { ...action, seat: ctl.hand.toAct });
+    announce(ctl);
+  }
+
+  function humanAct(ctl, action) {
+    if (!alive(ctl) || !ctl.canAct) return; // doppelter Klick zählt nicht
+    ctl.canAct = false;
+    applyAndLog(ctl, action);
+    step(ctl);
+  }
+
+  function finishHand(ctl) {
+    ctl.hand = Hand.settle(ctl.hand);
+    ctl.table = Session.finishHand(ctl.table, ctl.hand);
+    ui.state.store.saveTable(ctl.table); // gespeichert wird nur nach einer fertigen Hand
+    draw(ctl);
+  }
+
+  // Treibt die Hand voran: Board aufdecken, Bots ziehen lassen, auf den Spieler warten, Hand beenden.
+  function step(ctl) {
+    if (!alive(ctl)) return;
+    const hand = ctl.hand;
+    const instant = ui.state.botDelay === 0;
+    if (ctl.shown < hand.board.length) {
+      ctl.shown = instant ? hand.board.length : Math.min(hand.board.length, ctl.shown === 0 ? 3 : ctl.shown + 1);
+      if (instant) return step(ctl);
+      draw(ctl);
+      setTimeout(() => step(ctl), ui.state.botDelay);
+      return;
+    }
+    if (hand.toAct === null) {
+      finishHand(ctl);
+      return;
+    }
+    if (hand.toAct === 0) {
+      draw(ctl);
+      return;
+    }
+    const botMove = () => {
+      if (!alive(ctl)) return;
+      const seat = ctl.hand.toAct;
+      applyAndLog(ctl, Bots.botDecision(Hand.viewFor(ctl.hand, seat), Bots.BOT_BY_SEAT[seat], ui.state.rng));
+      step(ctl);
+    };
+    if (instant) {
+      botMove();
+    } else {
+      draw(ctl);
+      setTimeout(botMove, ui.state.botDelay);
+    }
+  }
+
+  function startNextHand(ctl) {
+    if (ctl.table.stacks[0] === 0) {
+      drawBust(ctl);
+      return;
+    }
+    ctl.hand = Session.startHand(ctl.table, ui.state.rng);
+    const button = ctl.hand.players[ctl.hand.button].name;
+    ctl.log = [button === 'Du' ? 'Neue Hand. Du bist der Button.' : `Neue Hand. ${button} ist der Button.`];
+    ctl.logCursor = 0;
+    ctl.shown = 0;
+    announce(ctl);
+    step(ctl);
+  }
+
+  function openTable() {
+    const ctl = {
+      table: ui.state.store.getTable() || Session.createTable(ui.state.rng),
+      hand: null, log: [], logCursor: 0, shown: 0, canAct: false,
+      render: ui.makeView({ back: true, sheet: false }),
+    };
+    currentCtl = ctl;
+    startNextHand(ctl);
+  }
+
+  Object.assign(ui, { renderCardBack, renderTable, renderHintBox, renderReviewBox, openTable });
+  ui.state.botDelay = 800; // Pause nach Bot-Zügen in Millisekunden; 0 = ohne Timer in einer Schleife
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-start">
+// Startet die App, nachdem alle anderen Blöcke geladen sind.
+(function (P) {
+  function safeLocalStorage() {
+    try {
+      return window.localStorage || null;
+    } catch (e) {
+      return null;
+    }
+  }
+  // Offline-Betrieb und dauerhafter Speicher nur über https oder localhost – beim Öffnen der Datei per Doppelklick passiert nichts davon.
+  const secure = window.location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  if (secure) {
+    // Manifest und Symbol erst hier einfügen: ein fester Link würde beim Öffnen per Doppelklick einen Ladefehler in der Konsole erzeugen.
+    for (const [rel, href] of [['manifest', 'manifest.webmanifest'], ['icon', 'icon-192.png']]) {
+      const link = document.createElement('link');
+      link.rel = rel;
+      link.href = href;
+      document.head.append(link);
+    }
+  }
+  if (secure && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if (secure && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  P.ui.start(document.getElementById('app'), { storage: safeLocalStorage(), rng: Math.random });
+})(globalThis.Poker);
+</script>
+</body>
+</html>
