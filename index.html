@@ -111,6 +111,145 @@ a.unit.open { border-color: var(--gold); }
 .code-box:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* Übersicht und Spielabend: große Bereichs-Kacheln */
+.areas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 16px 0; }
+.area {
+  display: flex; align-items: center; gap: 16px; padding: 18px; min-height: 120px; border-radius: 16px;
+  background: var(--panel); color: var(--text); text-decoration: none; border: 2px solid rgba(255, 255, 255, 0.14);
+}
+@media (hover: hover) { a.area:hover { background: rgba(0, 0, 0, 0.34); } }
+.area.locked { opacity: 0.55; }
+.area-icon { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(255, 255, 255, 0.14); font-size: 1.7rem; line-height: 1; }
+.area-body { display: grid; gap: 4px; }
+.area-title { font-size: 1.25rem; font-weight: 700; }
+.area-text { color: var(--muted); }
+@media (min-width: 900px) {
+  .areas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .area { flex-direction: column; align-items: flex-start; min-height: 190px; }
+}
+@media (min-width: 1400px) { #app.large { font-size: 20px; max-width: 1280px; } }
+
+/* Spielabend: Gewinner-Check */
+.gw-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 8px; }
+.gw-form { display: grid; gap: 10px; min-width: 0; }
+.gw-board { background: var(--panel); border-radius: 12px; padding: 8px 12px; }
+.gw-board .table-label { margin: 0; text-align: left; }
+.gw-player { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--panel); border-radius: 12px; padding: 6px 12px; }
+.gw-name { font-weight: 650; }
+.gw-hand { --cw: clamp(40px, 11.5vw, 58px); margin: 4px 0; flex-wrap: nowrap; justify-content: flex-start; gap: 8px; }
+.slot-btn { appearance: none; background: none; border: 0; padding: 0; border-radius: 10px; cursor: pointer; flex: none; }
+.slot-btn .card { pointer-events: none; }
+.slot-btn.active { outline: 3px solid var(--gold); outline-offset: 3px; }
+.gw-controls { margin-top: 4px; }
+.picker { background: var(--felt-dark); border-radius: 16px; padding: 10px 12px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.picker-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.picker-actions { display: flex; gap: 6px; }
+.picker-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 5px; margin: 6px 0 10px; }
+.picker-suit { grid-column: 1 / -1; font-size: 1.1rem; line-height: 1; }
+.picker-suit.red, .pick.red { color: #ff8f84; }
+.pick { appearance: none; border: 2px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.08); color: var(--text); font: inherit; font-weight: 700; border-radius: 10px; min-height: 44px; cursor: pointer; }
+.pick.current { border-color: var(--gold); background: rgba(242, 193, 78, 0.22); }
+.pick:disabled { opacity: 0.25; cursor: default; }
+.showdown-result { margin: 8px 0 12px; }
+.result-sentence { font-size: 1.3rem; font-weight: 750; margin: 0 0 4px; }
+.result-players { display: grid; gap: 8px; margin: 10px 0; }
+.result-player { background: rgba(0, 0, 0, 0.2); border: 2px solid transparent; border-radius: 14px; padding: 8px 10px; }
+.result-player.win { border-color: var(--good); }
+.result-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.win-badge { background: var(--good); color: #0f3f2c; border-radius: 999px; font-size: 0.75rem; font-weight: 800; padding: 1px 8px; }
+.result-cards { --cw: clamp(34px, 10vw, 52px); gap: 4px; justify-content: flex-start; margin: 6px 0 2px; flex-wrap: wrap; }
+.result-cards .hole-gap { margin-right: 8px; }
+@media (max-width: 899px) {
+  .picker {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 55vh; max-height: 55dvh; overflow-y: auto; border-radius: 16px 16px 0 0;
+    padding: 10px max(12px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  .gw.picking { padding-bottom: 58vh; }
+}
+@media (min-width: 900px) {
+  .gw-grid { grid-template-columns: minmax(0, 1fr) 400px; align-items: start; }
+  .picker { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; }
+}
+
+/* Spielabend: Regelwerk (große Seiten zum Vorführen) */
+.rulebook { max-width: 1000px; margin: 0 auto; }
+.rules-page { text-align: center; padding: 18px 4px; min-height: 40vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+.rules-title { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.8rem); margin: 0; }
+.rules-text { font-size: clamp(1.25rem, 1rem + 1.6vw, 2.4rem); line-height: 1.4; margin: 0; }
+.rules-ask { width: 100%; max-width: 40em; text-align: left; background: var(--panel); border-radius: 12px; padding: 4px 14px; }
+.rules-ask summary { cursor: pointer; font-weight: 650; min-height: 44px; display: flex; align-items: center; }
+.rules-ask p { margin: 0 0 12px; font-size: 1.1rem; }
+.rules-nav { margin: 8px 0 24px; }
+@media (max-width: 899px) {
+  /* Handy: „Zurück/Weiter“ bleiben am unteren Rand erreichbar, auch wenn die Frage zum Erklären aufgeklappt ist */
+  .rules-nav .btn { min-width: 0; flex: 1 1 0; padding: 10px 12px; font-size: 1rem; }
+  .rules-nav .fs-btn { display: none; } /* Vollbild ist für große Bildschirme gedacht */
+  .rules-nav { position: sticky; bottom: 0; z-index: 5; margin: 0; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--felt-dark) 75%, transparent); }
+}
+.rules-nav .btn { min-width: 130px; min-height: 52px; font-size: 1.1rem; }
+:fullscreen .rules-page { min-height: 65vh; }
+
+/* Spielabend: Handränge-Tafel */
+.tafel-buttons { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.tafel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; }
+.principles ul { margin: 6px 0 0; padding-left: 20px; }
+.principles li { margin: 4px 0; }
+.rank-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 14px 0; }
+.rank-entry { background: var(--panel); border-radius: 16px; padding: 16px; min-width: 0; }
+.rank-entry h2 { margin: 0 0 4px; font-size: 1.3rem; }
+.rank-entry .hand { justify-content: flex-start; margin: 8px 0; }
+.rank-desc { margin: 6px 0; }
+.rank-tie { margin: 6px 0; color: var(--muted); }
+.duel { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.duel-head, .duel-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.duel-hands { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 14px; }
+.hand.duel-cards { --cw: clamp(30px, 9vw, 44px); margin: 2px 0 6px; }
+.duel-note { margin: 4px 0 0; font-size: 0.95rem; }
+@media (min-width: 600px) { .duel-hands { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .rank-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.compact-btn { display: none; } /* nur ab 1400 px sichtbar (steht vor der Abfrage, damit sie gewinnt) */
+@media (min-width: 1400px) {
+  #app.large:has(.tafel) { max-width: 1860px; }
+  .tafel .rank-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .compact-btn { display: inline-flex; }
+  /* Kompaktansicht („Alles auf einem Bild“): alle zehn Einträge auf einem Full-HD-Bild, dafür kleine Schrift */
+  .tafel.compact .rank-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .tafel.compact .rank-entry { padding: 8px 10px; font-size: 13px; }
+  .tafel.compact h1 { margin: 0.1em 0; }
+  .tafel.compact .lead { margin: 0 0 6px; }
+  .tafel.compact .principles { padding: 8px 12px; }
+  .tafel.compact .principles h2 { display: none; }
+  .tafel.compact .principles ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+  .tafel.compact .principles li { margin: 0; }
+  .tafel.compact .rank-entry { line-height: 1.28; }
+  .tafel.compact .rank-entry .hand { margin: 4px 0; }
+  .tafel.compact .rank-cards { --cw: 40px; }
+  .tafel.compact .hand.duel-cards { --cw: 24px; margin: 1px 0 3px; }
+  .tafel.compact .duel { margin-top: 6px; padding-top: 6px; }
+  .tafel.compact .duel-note { font-size: 12px; }
+  .tafel.compact .rank-desc, .tafel.compact .rank-tie { margin: 3px 0; }
+}
+@media print {
+  body { background: #fff !important; color: #000; }
+  .topbar, .notice, #sheet, .no-print { display: none !important; }
+  #app { max-width: none; padding: 0; font-size: 11px; line-height: 1.3; }
+  .layout { display: block; }
+  .tafel h1, .tafel h2 { color: #000; }
+  .tafel .lead, .tafel .muted, .tafel .rank-tie, .tafel .duel-head, .tafel .duel-label { color: #333; }
+  .tafel .panel, .tafel .rank-entry { background: #fff; border: 1px solid #999; }
+  .tafel .rank-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .tafel .rank-entry { break-inside: avoid; page-break-inside: avoid; padding: 8px 10px; }
+  .tafel .rank-cards { --cw: 38px; }
+  .tafel .hand.duel-cards { --cw: 22px; }
+  .tafel .rank-entry .hand { margin: 4px 0; }
+  .tafel .rank-entry h2 { font-size: 13px; margin: 0; }
+  .tafel h1 { font-size: 20px; margin: 0 0 4px; }
+  .tafel .duel-note { font-size: 10.5px; }
+  .tafel .panel { padding: 6px 10px; }
+  .tafel .principles h2 { font-size: 12px; }
+  .card { box-shadow: none; border: 1px solid #888; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
 /* Spickzettel */
 .sheet { background: var(--panel); border-radius: 16px; padding: 14px 16px; }
 .sheet[hidden] { display: none; }
@@ -1154,6 +1293,249 @@ a.unit.open { border-color: var(--gold); }
 })(globalThis.Poker = globalThis.Poker || {});
 </script>
 
+<script id="m-spielabend">
+// Spielabend: Inhalte und Logik für Runden mit Freunden (Handränge-Tafel, Regelwerk, Gewinner-Check). Alles rein, ohne Oberfläche.
+(function (P) {
+  // Handränge-Tafel: Index = Kategorie (0 Hohe Karte … 9 Royal Flush), wie Poker.content.rankLessons.
+  // Die Tests schicken jedes Beispiel und jedes Duell durch den Auswerter, damit die Tafel dem Training nie widerspricht.
+  const rankDetails = [
+    {
+      category: 0, example: 'Ah Jd 9c 6s 3h',
+      description: 'Hohe Karte (High Card): Du hast keine der anderen Kombinationen. Dann zählt die höchste Karte deiner besten fünf – die schwächste Hand beim Poker.',
+      tiebreak: 'Gleichstand: Es zählt die höchste Karte, dann die zweithöchste und so weiter, bis alle fünf Karten verglichen sind.',
+      duel: { a: 'Ah Jd 9c 6s 3h', b: 'Ac Td 9h 6d 3s', winner: 'a', note: 'Beide haben das Ass als höchste Karte. Dann zählt die zweite Karte: Bube schlägt Zehn.' },
+    },
+    {
+      category: 1, example: 'Kh Kd 9c 6s 3h',
+      description: 'Paar (Pair): Zwei Karten mit demselben Rang, zum Beispiel zwei Könige. Die drei übrigen Karten passen zu nichts.',
+      tiebreak: 'Gleichstand: Das höhere Paar gewinnt. Bei demselben Paar entscheiden die drei übrigen Karten, die höchste zuerst.',
+      duel: { a: 'Kh Kd 9c 6s 3h', b: 'Qh Qd Ac Js 3d', winner: 'a', note: 'Könige schlagen Damen – auch wenn die Damen ein Ass als Zusatzkarte haben.' },
+    },
+    {
+      category: 2, example: 'Kh Kd 7c 7s 2h',
+      description: 'Zwei Paare (Two Pair): Zwei verschiedene Paare, zum Beispiel Könige und Siebener, plus eine fünfte Karte, die zu nichts passt.',
+      tiebreak: 'Gleichstand: Zuerst zählt das höhere Paar, dann das niedrigere Paar, zuletzt die fünfte Karte.',
+      duel: { a: 'Kh Kd 7c 7s 2h', b: 'Kc Ks 5c 5d Ah', winner: 'a', note: 'Beide haben Könige als höheres Paar. Dann zählt das zweite Paar: Siebener schlagen Fünfer – das Ass als fünfte Karte hilft nicht.' },
+    },
+    {
+      category: 3, example: 'Qh Qd Qc 7s 2h',
+      description: 'Drilling (Three of a Kind): Drei Karten mit demselben Rang, zum Beispiel drei Damen. Die zwei übrigen Karten passen zu nichts.',
+      tiebreak: 'Gleichstand: Der höhere Drilling gewinnt. Bei demselben Drilling (zum Beispiel bei einem Paar auf dem Tisch und je einer passenden Karte in der Hand) entscheiden die zwei übrigen Karten, die höchste zuerst.',
+      duel: { a: 'Qh Qd Qc 7s 2h', b: 'Jh Jd Jc As Kh', winner: 'a', note: 'Damen schlagen Buben – Ass und König als Zusatzkarten ändern daran nichts.' },
+    },
+    {
+      category: 4, example: '9h 8d 7c 6s 5h',
+      description: 'Straße (Straight): Fünf Karten in einer Reihe, zum Beispiel Neun bis Fünf. Die Farben spielen keine Rolle (sind alle gleich, ist es ein Straight Flush). Das Ass darf ganz oben (Zehn bis Ass) oder ganz unten (Ass bis Fünf) stehen, aber nie in der Mitte.',
+      tiebreak: 'Gleichstand: Die Straße mit der höchsten obersten Karte gewinnt. Ass bis Fünf ist die niedrigste Straße (Fünf hoch) und verliert gegen jede andere.',
+      duel: { a: '5h 4d 3c 2s Ah', b: '6h 5d 4c 3s 2h', winner: 'b', note: 'Bei Hand A zählt das Ass ganz unten (Ass bis Fünf, „Fünf hoch“). Die Straße bis Sechs ist stärker.' },
+    },
+    {
+      category: 5, example: 'Ah Jh 9h 6h 3h',
+      description: 'Flush: Fünf Karten in derselben Farbe, in beliebiger Reihenfolge. Bilden sie eine Reihe, ist es sogar ein Straight Flush.',
+      tiebreak: 'Gleichstand: Es zählt die höchste Karte der fünf, dann die zweithöchste und so weiter. Die Farbe selbst zählt nie.',
+      duel: { a: 'Ah Jh 9h 6h 3h', b: 'Ad Td 9d 6d 3d', winner: 'a', note: 'Beide haben das Ass. Dann entscheidet die zweite Karte: Bube schlägt Zehn.' },
+    },
+    {
+      category: 6, example: 'Kh Kd Kc 7s 7h',
+      description: 'Full House: Ein Drilling und ein Paar zusammen, zum Beispiel drei Könige und zwei Siebener. Man sagt: „Könige voll Siebener“.',
+      tiebreak: 'Gleichstand: Zuerst zählt der höhere Drilling, dann das höhere Paar.',
+      duel: { a: 'Kh Kd Kc 2s 2h', b: 'Qh Qd Qc As Ah', winner: 'a', note: 'Zuerst zählt der Drilling: Könige schlagen Damen – auch wenn die Damen ein Ass-Paar dabei haben.' },
+    },
+    {
+      category: 7, example: '7h 7d 7c 7s Kh',
+      description: 'Vierling (Four of a Kind): Vier Karten mit demselben Rang, zum Beispiel vier Siebener, plus eine fünfte Karte. Diese Zusatzkarte heißt Kicker; sie zählt nur bei Gleichstand.',
+      tiebreak: 'Gleichstand: Der höhere Vierling gewinnt. Liegt er auf dem Tisch, haben alle dieselben vier Karten – dann entscheidet die fünfte Karte.',
+      duel: { a: '7h 7d 7c 7s Kh', b: '7h 7d 7c 7s Qd', winner: 'a', note: 'Die vier Siebener liegen auf dem Tisch, beide haben sie. Die fünfte Karte entscheidet: König schlägt Dame.' },
+    },
+    {
+      category: 8, example: '9h 8h 7h 6h 5h',
+      description: 'Straight Flush: Fünf Karten in einer Reihe, alle in derselben Farbe, zum Beispiel Neun bis Fünf in Herz. Er schlägt alles außer einem höheren Straight Flush.',
+      tiebreak: 'Gleichstand: Wie bei der Straße zählt die höchste Karte der Reihe. Auch hier ist Ass bis Fünf die niedrigste.',
+      duel: { a: '9h 8h 7h 6h 5h', b: '6d 5d 4d 3d 2d', winner: 'a', note: 'Beide sind ein Straight Flush. Der bis Neun ist höher als der bis Sechs.' },
+    },
+    {
+      category: 9, example: 'Ah Kh Qh Jh Th',
+      description: 'Royal Flush: Die fünf höchsten Karten – Zehn, Bube, Dame, König und Ass – alle in derselben Farbe. Das ist die beste Hand beim Poker und kommt fast nie vor.',
+      tiebreak: 'Gleichstand: Einen höheren Royal Flush gibt es nicht. Liegt er auf dem Tisch, haben ihn alle – der Pot wird geteilt. Farben zählen nie.',
+      duel: { a: 'Ah Kh Qh Jh Th', b: 'Ah Kh Qh Jh Th', winner: 'tie', note: 'Der Royal Flush liegt auf dem Tisch, beide spielen ihn – der Pot wird geteilt.' },
+    },
+  ];
+
+  // Grundsätze, die für alle Handränge gelten.
+  const principles = [
+    'Jeder bildet seine beste Hand aus genau fünf Karten – aus den zwei eigenen und den fünf auf dem Tisch, also aus sieben Karten.',
+    'Alle vier Farben sind gleich viel wert. Eine Farbe ist nie stärker als eine andere.',
+    'Das Ass zählt hoch (Zehn bis Ass) und in der niedrigsten Straße tief (Ass bis Fünf).',
+    'Haben zwei Spieler denselben Rang, zählt zuerst die Höhe der Kombination (das höhere Paar, der höhere Drilling …). Ist auch die gleich, entscheidet die Zusatzkarte – der Kicker.',
+    'Sind auch die Zusatzkarten gleich, gibt es einen Gleichstand und der Pot wird geteilt.',
+  ];
+
+  // Regelwerk „So läuft eine Runde“: Seite für Seite zum Vorführen (höchstens 50 Wörter), mit einer Frage zum Erklären.
+  // Die Tests achten auf die Reihenfolge der Tischbegriffe: Flop, Turn und River stehen erst auf ihrer eigenen Seite.
+  const rulesPages = [
+    {
+      id: 'ziel', title: 'Worum geht es?',
+      text: 'Wir spielen No-Limit Texas Hold\'em. Ihr spielt um Chips in der Mitte, den Pot. Ihr gewinnt ihn auf zwei Arten: Alle anderen geben auf – oder am Ende hat jemand die beste Hand. „No-Limit“ heißt: Man darf so viel setzen, wie man Chips hat.',
+      ask: 'Was glaubst du: Gewinnt immer die beste Hand?',
+    },
+    {
+      id: 'spieler', title: 'Button und Blinds',
+      text: 'Vor einem Spieler liegt der Button, ein Markierungsstein: Dieser Spieler gibt die Karten. Die zwei Spieler links davon setzen Pflichteinsätze, die Blinds: erst der kleine, dann der große (doppelt so hoch). So liegt schon etwas im Pot. Nach jeder Runde wandert der Button einen Platz weiter.',
+      ask: 'Warum müssen manche Spieler zu Beginn schon Chips in die Mitte legen?',
+    },
+    {
+      id: 'austeilen', title: 'Die ersten zwei Karten',
+      text: 'Jeder bekommt zwei Karten verdeckt, die nur er sehen darf: die Handkarten. Danach folgt die erste Setzrunde, Preflop genannt: bevor Karten auf den Tisch kommen. Es beginnt der Spieler links vom großen Blind; reihum wird gesetzt (Einzelheiten gleich auf der Seite „Was man tun kann“).',
+      ask: 'Warum dürfen die anderen deine zwei Karten nicht sehen?',
+    },
+    {
+      id: 'flop', title: 'Flop: drei Tischkarten',
+      text: 'Jetzt werden drei Karten offen in die Tischmitte gelegt, der Flop. Diese Gemeinschaftskarten gehören allen Spielern. Dann wird wieder gesetzt – diesmal beginnt der erste Spieler links vom Button, der noch dabei ist.',
+      ask: 'Warum ist der Moment spannend, in dem die drei Karten aufgedeckt werden?',
+    },
+    {
+      id: 'turn', title: 'Turn: die vierte Karte',
+      text: 'Eine vierte Gemeinschaftskarte kommt offen dazu, der Turn. Wieder folgt eine Setzrunde, in derselben Reihenfolge wie nach dem Flop.',
+      ask: 'Wie viele Karten können jetzt noch kommen?',
+    },
+    {
+      id: 'river', title: 'River: die fünfte Karte',
+      text: 'Die fünfte und letzte Gemeinschaftskarte heißt River. Es folgt die letzte Setzrunde – danach liegen alle fünf Karten in der Mitte.',
+      ask: 'Was ändert sich, wenn keine Karte mehr kommt?',
+    },
+    {
+      id: 'setzen', title: 'Was man tun kann',
+      text: 'Wer dran ist, hat diese Möglichkeiten: Check heißt schieben – nichts setzen, wenn vor einem niemand gesetzt hat. Der erste Einsatz heißt Bet. Call: mitgehen, also den Einsatz bezahlen. Raise: erhöhen. Fold: aufgeben und die Karten weglegen; schon gesetzte Chips bleiben im Pot. All-in: alle Chips setzen.',
+      ask: 'Warum gibt man nie auf, wenn man kostenlos schieben kann?',
+    },
+    {
+      id: 'showdown', title: 'Showdown: wer gewinnt?', link: 'haende',
+      text: 'Sind nach der letzten Setzrunde noch mehrere Spieler dabei, müssen alle ihre Karten aufdecken: der Showdown. Jeder bildet aus seinen zwei und den fünf Tischkarten die beste Hand aus genau fünf dieser sieben Karten. Wer die stärkste Hand hat, bekommt den Pot.',
+      ask: 'Welche Hand ist stärker: eine Straße oder ein Flush?',
+    },
+    {
+      id: 'gleichstand', title: 'Gleichstand',
+      text: 'Haben zwei oder mehr Spieler genau gleich starke Hände, teilen sie den Pot. Die Farben spielen dabei nie eine Rolle. Kann niemand die fünf Tischkarten mit seinen Handkarten verbessern, spielen alle den Tisch: Dann wird der Pot unter allen aufgeteilt.',
+      ask: 'Spielt die Farbe einer Karte beim Vergleich eine Rolle?',
+    },
+    {
+      id: 'zuhause', title: 'Zu Hause am Tisch',
+      text: 'Im Casino legt der Geber vor Flop, Turn und River eine Karte verdeckt ab: die Brennkarte. Das schützt vor markierten Karten. Zu Hause lässt man sie oft weg – einigt euch am Anfang darauf, wie ihr es haltet.',
+      ask: 'Worauf müsst ihr euch vor dem ersten Spiel einigen?',
+    },
+  ];
+
+  // --- Gewinner-Check ---
+
+  const MIN_PLAYERS = 2;
+  const MAX_PLAYERS = 10;
+  const keyOf = (card) => P.cards.cardToString(card);
+  const clampPlayers = (n) => Math.max(MIN_PLAYERS, Math.min(MAX_PLAYERS, Math.trunc(Number(n)) || MIN_PLAYERS));
+  const fail = (error, message) => ({ ok: false, error, message });
+
+  // „A“, „A und B“, „A, B und C“
+  function listDe(names) {
+    return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} und ${names[names.length - 1]}`;
+  }
+
+  // Wertet einen Showdown aus: board = fünf Tischkarten, players = je zwei Karten (und optional ein Name).
+  function judgeShowdown({ board, players }) {
+    const { bestOf7, evaluate5, compareValues } = P.evaluator;
+    const { describeHandDe, explainComparison, cardNameDe } = P.names;
+    if (!Array.isArray(board) || board.length !== 5) return fail('board', 'Auf dem Tisch müssen genau fünf Karten liegen.');
+    if (!Array.isArray(players) || players.length < MIN_PLAYERS || players.length > MAX_PLAYERS) {
+      return fail('players', `Es müssen zwischen ${MIN_PLAYERS} und ${MAX_PLAYERS} Spieler mitspielen.`);
+    }
+    if (players.some((p) => !p || !Array.isArray(p.cards) || p.cards.length !== 2)) return fail('cards', 'Jeder Spieler braucht genau zwei Karten.');
+    const seen = new Set();
+    for (const card of [...board, ...players.flatMap((p) => p.cards)]) {
+      if (seen.has(keyOf(card))) return fail('duplicate', `Die Karte ${cardNameDe(card)} kommt doppelt vor.`);
+      seen.add(keyOf(card));
+    }
+
+    const results = players.map((p, index) => {
+      const { value, best5 } = bestOf7([...board, ...p.cards]);
+      return { index, name: p.name || `Spieler ${index + 1}`, value, best5, label: describeHandDe(value), wins: false };
+    });
+    let top = results[0].value;
+    for (const r of results) if (compareValues(r.value, top) > 0) top = r.value;
+    results.forEach((r) => { r.wins = compareValues(r.value, top) === 0; });
+    const winners = results.filter((r) => r.wins);
+
+    let sentence;
+    let reason;
+    if (winners.length === 1) {
+      const others = results.filter((r) => !r.wins);
+      let runnerUp = others[0].value;
+      for (const r of others) if (compareValues(r.value, runnerUp) > 0) runnerUp = r.value;
+      sentence = `${winners[0].name} gewinnt mit ${winners[0].label}.`;
+      reason = explainComparison(winners[0].value, runnerUp);
+    } else {
+      const names = listDe(winners.map((r) => r.name));
+      const playsBoard = winners.every((r) => compareValues(r.value, evaluate5(board)) === 0);
+      sentence = playsBoard
+        ? `Gleichstand: ${names} teilen den Pot – die besten fünf Karten liegen auf dem Tisch.`
+        : `Gleichstand: ${names} teilen den Pot mit ${winners[0].label}.`;
+      reason = explainComparison(winners[0].value, winners[1].value);
+    }
+    return { ok: true, winners: winners.map((r) => r.index), results, sentence, reason };
+  }
+
+  // Formular für die Oberfläche: unveränderliche Zustände, damit sich alles testen lässt.
+  // Plätze: { kind: 'board', index: 0–4 } oder { kind: 'player', player: n, index: 0|1 }.
+  const emptyShowdown = (playerCount = 2) => ({
+    board: [null, null, null, null, null],
+    players: Array.from({ length: clampPlayers(playerCount) }, () => [null, null]),
+  });
+
+  function allSlots(state) {
+    const slots = state.board.map((_, index) => ({ kind: 'board', index }));
+    state.players.forEach((_, player) => { slots.push({ kind: 'player', player, index: 0 }, { kind: 'player', player, index: 1 }); });
+    return slots;
+  }
+
+  const cardAt = (state, slot) => (slot.kind === 'board' ? state.board[slot.index] : state.players[slot.player][slot.index]);
+  const sameSlot = (a, b) => a.kind === b.kind && a.index === b.index && (a.kind === 'board' || a.player === b.player);
+
+  function usedCards(state) {
+    return allSlots(state).map((slot) => cardAt(state, slot)).filter(Boolean).map(keyOf);
+  }
+
+  function setCard(state, slot, card) {
+    if (card) {
+      const current = cardAt(state, slot);
+      if (usedCards(state).includes(keyOf(card)) && !(current && keyOf(current) === keyOf(card))) return { ok: false, error: 'duplicate' };
+    }
+    const next = { board: state.board.slice(), players: state.players.map((p) => p.slice()) };
+    if (slot.kind === 'board') next.board[slot.index] = card;
+    else next.players[slot.player][slot.index] = card;
+    return { ok: true, state: next };
+  }
+
+  function resizePlayers(state, n) {
+    const count = clampPlayers(n);
+    const players = Array.from({ length: count }, (_, i) => (state.players[i] ? state.players[i].slice() : [null, null]));
+    return { board: state.board.slice(), players };
+  }
+
+  const isComplete = (state) => allSlots(state).every((slot) => cardAt(state, slot));
+
+  // Der erste freie Platz nach `after` (ohne Umbruch); ohne `after` der erste freie Platz überhaupt.
+  function nextEmptySlot(state, after) {
+    const slots = allSlots(state);
+    const start = after ? slots.findIndex((slot) => sameSlot(slot, after)) + 1 : 0;
+    return slots.slice(start).find((slot) => !cardAt(state, slot)) || null;
+  }
+
+  const toShowdown = (state) => ({ board: state.board.slice(), players: state.players.map((cards) => ({ cards: cards.slice() })) });
+
+  P.spielabend = {
+    rankDetails, principles, rulesPages,
+    MIN_PLAYERS, MAX_PLAYERS, judgeShowdown, emptyShowdown, setCard, usedCards, resizePlayers, isComplete, nextEmptySlot, toShowdown,
+  };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
 <script id="m-analysis">
 // Einschätzung von Starthänden und Händen mit Board – für die Bots und den Coach.
 (function (P) {
@@ -2154,15 +2536,24 @@ a.unit.open { border-color: var(--gold); }
 
   // --- Seitengerüst ---
 
-  // Setzt eine neue Seite zusammen. opts.sheet: Spickzettel zuerst offen; opts.back: Link zur Übersicht.
+  // Wohin der Rückknopf führt: aus Einheiten ins Training, aus den Spielabend-Unterseiten zum Spielabend, sonst zur Übersicht.
+  function backTarget() {
+    const hash = window.location.hash;
+    if (/^#\/unit\//.test(hash)) return { href: '#/training', label: '← Training' };
+    if (/^#\/spielabend\/./.test(hash)) return { href: '#/spielabend', label: '← Spielabend' };
+    return { href: '#/', label: '← Übersicht' };
+  }
+
+  // Setzt eine neue Seite zusammen. opts.sheet: Spickzettel zuerst offen; opts.back: Rückknopf (Ziel je nach Adresse, siehe backTarget).
   function show(main, opts = {}) {
     state.sheet = buildSheet();
     state.sheetBtn = h('button', { class: 'btn ghost', type: 'button', 'aria-controls': 'sheet', onclick: () => toggleCheatSheet() }, 'Spickzettel');
     state.main = h('main', {}, main);
     state.layout = h('div', { class: 'layout' }, state.main, state.sheet);
+    const back = backTarget();
     const bar = h('header', { class: 'topbar' },
       h('a', { class: 'brand', href: '#/' }, '♠ Poker lernen'),
-      h('div', { class: 'topbar-actions' }, opts.back ? h('a', { class: 'btn ghost', href: '#/' }, '← Übersicht') : null, state.sheetBtn));
+      h('div', { class: 'topbar-actions' }, opts.back ? h('a', { class: 'btn ghost', href: back.href }, back.label) : null, state.sheetBtn));
     const notices = [];
     if (!state.store.persistent) {
       notices.push(h('div', { class: 'notice', role: 'status' }, 'Dein Fortschritt wird in diesem Browser nicht gespeichert.'));
@@ -2176,6 +2567,7 @@ a.unit.open { border-color: var(--gold); }
       state.flash = null;
     }
     state.root.replaceChildren(bar, ...notices, state.layout);
+    state.root.classList.toggle('large', /^(#\/?$|#\/spielabend)/.test(window.location.hash)); // Übersicht und Spielabend: ab 1400 px größer
     toggleCheatSheet(!!opts.sheet && !isNarrow()); // auf dem Handy nie von selbst offen
     window.scrollTo(0, 0);
   }
@@ -2204,14 +2596,21 @@ a.unit.open { border-color: var(--gold); }
       : h('div', { class: 'unit locked', 'aria-disabled': 'true' }, body));
   }
 
+  // Eine große Bereichs-Kachel der Übersicht (oder der Spielabend-Auswahl).
+  function areaTile({ href, symbol, title, text, locked }) {
+    const body = [
+      h('span', { class: 'area-icon', 'aria-hidden': 'true' }, symbol),
+      h('span', { class: 'area-body' },
+        h('span', { class: 'area-title' }, title, locked ? h('span', { class: 'sr' }, ' (gesperrt)') : null),
+        h('span', { class: 'area-text' }, text)),
+    ];
+    return locked ? h('div', { class: 'area locked', 'aria-disabled': 'true' }, body) : h('a', { class: 'area', href }, body);
+  }
+
+  // Übersicht: die drei Bereiche, darunter Fortschritt sichern und zurücksetzen.
   function renderHome() {
-    const botTile = h('li', {}, state.store.isTableUnlocked()
-      ? h('a', { class: 'unit open', href: '#/table' },
-        h('span', { class: 'icon', 'aria-hidden': 'true' }, '♠'),
-        h('span', {}, h('div', { class: 'label' }, 'Neu'), h('div', { class: 'title' }, 'Bot-Tisch mit Coach')))
-      : h('div', { class: 'unit locked', 'aria-disabled': 'true' },
-        h('span', { class: 'icon', 'aria-hidden': 'true' }, '🔒'),
-        h('span', {}, h('div', { class: 'label' }, 'Bot-Tisch'), h('div', { class: 'title' }, 'Schließe Stufe 2 ab, dann schaltet sich der Tisch frei'))));
+    const total = Prog.UNIT_ORDER.length;
+    const passed = Prog.UNIT_ORDER.filter((id) => state.store.isPassed(id)).length;
     const reset = h('button', {
       class: 'btn ghost',
       type: 'button',
@@ -2224,10 +2623,48 @@ a.unit.open { border-color: var(--gold); }
     }, 'Fortschritt zurücksetzen');
     show(h('div', {},
       h('h1', {}, 'Texas Hold\'em lernen'),
-      h('p', { class: 'lead' }, 'Schritt für Schritt von null. Hast du in einer Runde mindestens 80 % richtig, schaltet sich die nächste Stufe frei.'),
-      h('ol', { class: 'path' }, Prog.UNIT_ORDER.map(unitRow), botTile),
+      h('p', { class: 'lead' }, 'Wähle, womit du loslegen willst.'),
+      h('div', { class: 'areas' },
+        areaTile({
+          href: '#/training', symbol: '♠', title: 'Training',
+          text: passed === total ? 'Alles geschafft – du kannst jede Einheit wiederholen.' : `${passed} von ${total} Einheiten bestanden`,
+        }),
+        areaTile({
+          href: '#/table', symbol: '♦', title: 'Bot-Tisch', locked: !state.store.isTableUnlocked(),
+          text: state.store.isTableUnlocked() ? 'Spiele gegen drei Bots – mit Coach' : 'Schließe Stufe 2 ab, dann schaltet sich der Tisch frei',
+        }),
+        areaTile({ href: '#/spielabend', symbol: '♣', title: 'Spielabend', text: 'Handränge-Tafel, Regelwerk und Gewinner-Check für deine Runde mit Freunden' })),
       ui.renderBackup ? ui.renderBackup() : null,
       h('div', { class: 'footer-actions' }, reset)), { sheet: false });
+  }
+
+  // Training: die Einheiten der Reihe nach (früher die ganze Startseite).
+  function renderTraining() {
+    show(h('div', {},
+      h('h1', {}, 'Training'),
+      h('p', { class: 'lead' }, 'Schritt für Schritt von null. Hast du in einer Runde mindestens 80 % richtig, schaltet sich die nächste Stufe frei.'),
+      h('ol', { class: 'path' }, Prog.UNIT_ORDER.map(unitRow))), { sheet: false, back: true });
+  }
+
+  // Spielabend: Auswahl der Hilfen. Die Unterseiten tragen sich selbst in `pages` ein (Schlüssel = Adresse ohne „#/“).
+  const pages = {};
+  pages.spielabend = () => {
+    show(h('div', {},
+      h('h1', {}, 'Spielabend'),
+      h('p', { class: 'lead' }, 'Hilfen für eure Runde. Hier musst du nichts freischalten – den Link zu diesem Bereich kannst du auch an Freunde weitergeben.'),
+      h('div', { class: 'areas' },
+        areaTile({ href: '#/spielabend/haende', symbol: '♥', title: 'Handränge-Tafel', text: 'Alle zehn Hände groß, mit Beispielen und Gleichstand-Regeln – auch zum Ausdrucken.' }),
+        areaTile({ href: '#/spielabend/regeln', symbol: '♠', title: 'Regelwerk', text: 'So läuft eine Runde – Seite für Seite zum Vorführen.' }),
+        areaTile({ href: '#/spielabend/gewinner', symbol: '♣', title: 'Gewinner-Check', text: 'Karten eingeben und sehen, wer gewinnt – und warum.' }))), { sheet: false, back: true });
+  };
+
+  // Aufräum-Funktionen der aktuellen Seite (Tastatur, Vollbild …): route() führt sie vor jeder neuen Seite aus.
+  const cleanups = [];
+  const onLeave = (fn) => { cleanups.push(fn); };
+  function runCleanups() {
+    while (cleanups.length) {
+      try { cleanups.pop()(); } catch (e) { /* Aufräumen darf nie die nächste Seite verhindern */ }
+    }
   }
 
   // --- Einheiten und Routing ---
@@ -2241,20 +2678,46 @@ a.unit.open { border-color: var(--gold); }
     show(h('div', { class: 'panel' },
       h('h2', {}, Content.unitTitles[unitId]),
       h('p', {}, 'Diese Einheit ist noch nicht fertig.'),
-      h('a', { class: 'btn', href: '#/' }, 'Zurück zur Übersicht')), { back: true });
+      h('a', { class: 'btn', href: '#/training' }, 'Zurück zum Training')), { back: true });
   }
 
   function route() {
-    const m = /^#\/unit\/([\w-]+)$/.exec(window.location.hash);
-    if (m && Prog.UNIT_ORDER.includes(m[1]) && state.store.isUnlocked(m[1])) {
-      runUnit(m[1]);
+    runCleanups();
+    const hash = window.location.hash;
+    if (hash === '' || hash === '#' || hash === '#/') {
+      renderHome();
       return;
     }
-    if (window.location.hash === '#/table' && state.store.isTableUnlocked() && ui.openTable) {
+    if (hash === '#/training') {
+      renderTraining();
+      return;
+    }
+    const m = /^#\/unit\/([\w-]+)$/.exec(hash);
+    if (m && Prog.UNIT_ORDER.includes(m[1])) {
+      if (state.store.isUnlocked(m[1])) {
+        runUnit(m[1]);
+        return;
+      }
+      window.history.replaceState(null, '', '#/training'); // gesperrte Einheit: zurück zur Liste
+      renderTraining();
+      return;
+    }
+    if (hash === '#/table' && state.store.isTableUnlocked() && ui.openTable) {
       ui.openTable();
       return;
     }
-    if (window.location.hash && window.location.hash !== '#/') window.history.replaceState(null, '', '#/');
+    if (/^#\/spielabend(\/[\w-]+)*$/.test(hash)) {
+      const parts = hash.slice(2).split('/'); // ['spielabend', 'regeln', '3']
+      const page = pages[parts.length > 1 ? `spielabend/${parts[1]}` : 'spielabend'];
+      if (page) {
+        page(parts.slice(2));
+        return;
+      }
+      window.history.replaceState(null, '', '#/spielabend');
+      pages.spielabend([]);
+      return;
+    }
+    window.history.replaceState(null, '', '#/');
     renderHome();
   }
 
@@ -2269,7 +2732,7 @@ a.unit.open { border-color: var(--gold); }
     route();
   }
 
-  Object.assign(ui, { h, state, unitRunners, renderCard, renderCards, show, setMain, toggleCheatSheet, runUnit, start, renderHome });
+  Object.assign(ui, { h, state, unitRunners, renderCard, renderCards, show, setMain, toggleCheatSheet, runUnit, start, renderHome, renderTraining, pages, onLeave });
 })(globalThis.Poker = globalThis.Poker || {});
 </script>
 
@@ -2313,9 +2776,9 @@ a.unit.open { border-color: var(--gold); }
         ? 'Das reicht für die nächste Stufe.'
         : `Du brauchst mindestens ${needed} von ${total} richtig. Probier es gleich noch einmal.`),
       h('div', { class: 'actions' },
-        passed ? h('a', { class: 'btn', href: '#/' }, 'Weiter') : null,
+        passed ? h('a', { class: 'btn', href: '#/training' }, 'Zum Training') : null,
         button(passed ? 'Nochmal üben' : 'Nochmal', retry, passed ? 'btn ghost' : 'btn'),
-        passed ? null : h('a', { class: 'btn ghost', href: '#/' }, 'Zur Übersicht'))), { back: true });
+        passed ? null : h('a', { class: 'btn ghost', href: '#/training' }, 'Zurück zum Training'))), { back: true });
   }
 
   // Allgemeine Rundenschleife für Stufe 1–3.
@@ -2978,6 +3441,271 @@ a.unit.open { border-color: var(--gold); }
   }
 
   ui.renderBackup = renderBackup;
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-spielabend">
+// Spielabend: Handränge-Tafel, Regelwerk und Gewinner-Check. Die Seiten tragen sich in ui.pages ein (Adresse ohne „#/“).
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const { spielabend: Sp, names: Names } = P;
+  const { parseCards } = P.cards;
+
+  // --- Handränge-Tafel ---
+
+  const DUEL_RESULT = { a: 'Hand A gewinnt.', b: 'Hand B gewinnt.', tie: 'Gleichstand.' };
+
+  function duelHand(cards, label) {
+    return h('div', { class: 'duel-hand' }, h('div', { class: 'duel-label' }, label), ui.renderCards(parseCards(cards), 'duel-cards'));
+  }
+
+  function rankEntry(d) {
+    return h('article', { class: 'rank-entry' },
+      h('h2', {}, `${10 - d.category}. ${Names.firstMention(d.category)}`),
+      ui.renderCards(parseCards(d.example), 'rank-cards'),
+      h('p', { class: 'rank-desc' }, d.description),
+      h('p', { class: 'rank-tie' }, d.tiebreak),
+      h('div', { class: 'duel' },
+        h('div', { class: 'duel-head' }, 'Duell'),
+        h('div', { class: 'duel-hands' }, duelHand(d.duel.a, 'Hand A'), duelHand(d.duel.b, 'Hand B')),
+        h('p', { class: 'duel-note' }, h('strong', {}, DUEL_RESULT[d.duel.winner] + ' '), d.duel.note)));
+  }
+
+  ui.pages['spielabend/haende'] = () => {
+    // Am großen Bildschirm ist die Schrift normal; „Alles auf einem Bild“ zeigt alle zehn Einträge kompakt (nur ab 1400 px sichtbar).
+    const compactButton = ui.button('Alles auf einem Bild', () => {
+      const compact = document.querySelector('.tafel').classList.toggle('compact');
+      compactButton.textContent = compact ? 'Größer lesen' : 'Alles auf einem Bild';
+    }, 'btn ghost compact-btn');
+    ui.show(h('div', { class: 'tafel' },
+      h('div', { class: 'tafel-head' },
+        h('h1', {}, 'Handränge-Tafel'),
+        h('span', { class: 'no-print tafel-buttons' },
+          compactButton,
+          ui.button('Drucken', () => window.print(), 'btn ghost'))),
+      h('p', { class: 'lead' }, 'Von der stärksten zur schwächsten Hand. Verglichen wird zuerst der Rang, bei gleichem Rang dann die Höhe der Karten und zuletzt die Zusatzkarte.'),
+      h('section', { class: 'panel principles' }, h('h2', {}, 'Das gilt immer'), h('ul', {}, Sp.principles.map((t) => h('li', {}, t)))),
+      h('div', { class: 'rank-grid' }, Sp.rankDetails.slice().reverse().map(rankEntry))), { sheet: false, back: true });
+  };
+
+  // --- Regelwerk ---
+
+  // Seite für Seite zum Vorführen: Knöpfe, Pfeiltasten, Wischen; die Seitenzahl steht in der Adresse (#/spielabend/regeln/3).
+  ui.pages['spielabend/regeln'] = (rest) => {
+    const pages = Sp.rulesPages;
+    const wanted = Number(rest[0]);
+    let index = Number.isInteger(wanted) && wanted >= 1 && wanted <= pages.length ? wanted - 1 : 0;
+    const render = ui.makeView({ back: true, sheet: false });
+    let fullscreenButton = null;
+
+    function go(next) {
+      if (next < 0 || next > pages.length - 1 || next === index) return;
+      index = next;
+      draw(true);
+    }
+
+    function fullscreenLabel() { return document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild'; }
+
+    function draw(keepFocus) {
+      const page = pages[index];
+      const last = index === pages.length - 1;
+      window.history.replaceState(null, '', `#/spielabend/regeln/${index + 1}`);
+      const next = last ? h('a', { class: 'btn', href: '#/spielabend' }, 'Zum Spielabend') : ui.button('Weiter', () => go(index + 1));
+      fullscreenButton = document.fullscreenEnabled
+        ? ui.button(fullscreenLabel(), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }, 'btn ghost fs-btn')
+        : null;
+      render(h('div', { class: 'rulebook' },
+        ui.progressBar(`Regelwerk · Seite ${index + 1} von ${pages.length}`, index + 1, pages.length),
+        h('section', { class: 'rules-page', 'aria-live': 'polite' },
+          h('h2', { class: 'rules-title' }, page.title),
+          h('p', { class: 'rules-text' }, page.text),
+          h('details', { class: 'rules-ask' }, h('summary', {}, 'Frage zum Erklären'), h('p', {}, page.ask)),
+          page.link === 'haende' ? h('a', { class: 'btn ghost', href: '#/spielabend/haende' }, 'Zur Handränge-Tafel') : null),
+        h('div', { class: 'actions rules-nav' },
+          index > 0 ? ui.button('Zurück', () => go(index - 1), 'btn ghost') : null,
+          next,
+          fullscreenButton)), { keepScroll: false });
+      if (keepFocus) next.focus({ preventScroll: true }); // der Fokus bleibt beim Blättern auf „Weiter“
+    }
+
+    const typing = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+    const onKey = (event) => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || typing(event.target)) return;
+      if (event.key === 'ArrowRight') go(index + 1);
+      else if (event.key === 'ArrowLeft') go(index - 1);
+    };
+    let touch = null;
+    const sheetOpen = () => ui.state.sheet && !ui.state.sheet.hidden;
+    const onTouchStart = (event) => { touch = sheetOpen() ? null : { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY }; };
+    const onTouchEnd = (event) => {
+      if (!touch) return;
+      const dx = event.changedTouches[0].clientX - touch.x;
+      const dy = event.changedTouches[0].clientY - touch.y;
+      touch = null;
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) go(index + (dx < 0 ? 1 : -1)); // Wisch nach links = weiter
+    };
+    const onFullscreen = () => { if (fullscreenButton) fullscreenButton.textContent = fullscreenLabel(); };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    document.addEventListener('fullscreenchange', onFullscreen);
+    ui.onLeave(() => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('fullscreenchange', onFullscreen);
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    });
+    draw(false);
+  };
+
+  // --- Gewinner-Check ---
+
+  const SUITS = [['s', '♠', 'black'], ['h', '♥', 'red'], ['d', '♦', 'red'], ['c', '♣', 'black']];
+  const RANKS = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+  const RANK_TEXT = { 10: '10', 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+  const rankText = (rank) => RANK_TEXT[rank] || String(rank);
+  const slotKey = (slot) => (slot.kind === 'board' ? `slot-board-${slot.index}` : `slot-${slot.player}-${slot.index}`);
+  const cardKey = (card) => P.cards.cardToString(card);
+  const isWide = () => window.matchMedia('(min-width: 900px)').matches;
+
+  ui.pages['spielabend/gewinner'] = () => {
+    let state = Sp.emptyShowdown(2);
+    let active = { kind: 'board', index: 0 };
+    let pickerOpen = isWide(); // am Handy öffnet der Auswähler erst mit dem ersten Tippen auf einen Platz
+    let result = null;
+    let message = '';
+    const render = ui.makeView({ back: true, sheet: false });
+
+    const cardAt = (slot) => (slot.kind === 'board' ? state.board[slot.index] : state.players[slot.player][slot.index]);
+    const slotLabel = (slot) => (slot.kind === 'board' ? `Tischkarte ${slot.index + 1}` : `Spieler ${slot.player + 1}, Karte ${slot.index + 1}`);
+
+    function slotButton(slot) {
+      const card = cardAt(slot);
+      const isActive = pickerOpen && active.kind === slot.kind && active.index === slot.index && (slot.kind === 'board' || active.player === slot.player);
+      return h('button', {
+        class: 'slot-btn' + (isActive ? ' active' : ''), type: 'button', 'data-key': slotKey(slot),
+        'aria-label': `${slotLabel(slot)}: ${card ? P.names.cardNameDe(card) : 'leer'}`,
+        'aria-pressed': String(isActive),
+        onclick: () => { active = slot; pickerOpen = true; result = null; message = ''; draw(); },
+      }, card ? ui.renderCard(card) : h('div', { class: 'card slot', 'aria-hidden': 'true' }));
+    }
+
+    function choose(card) {
+      const r = Sp.setCard(state, active, card);
+      if (!r.ok) return;
+      state = r.state;
+      result = null;
+      message = '';
+      const next = Sp.nextEmptySlot(state, active) || Sp.nextEmptySlot(state);
+      if (next) active = next;
+      else pickerOpen = false; // alles belegt
+      draw();
+    }
+
+    function picker() {
+      const used = new Set(Sp.usedCards(state));
+      const current = cardAt(active);
+      const currentKey = current ? cardKey(current) : null;
+      return h('div', { class: 'picker', role: 'group', 'aria-label': 'Karte wählen' },
+        h('div', { class: 'picker-head' },
+          h('strong', {}, slotLabel(active)),
+          h('span', { class: 'picker-actions' },
+            ui.button('Platz leeren', () => { state = Sp.setCard(state, active, null).state; result = null; draw(); }, 'btn ghost small'),
+            ui.button('Schließen', () => { pickerOpen = false; draw(); }, 'btn ghost small'))),
+        SUITS.map(([suit, symbol, color]) => h('div', { class: 'picker-row' },
+          h('div', { class: 'picker-suit ' + color, 'aria-hidden': 'true' }, symbol),
+          RANKS.map((rank) => {
+            const card = { rank, suit };
+            const key = cardKey(card);
+            const btn = h('button', {
+              class: 'pick ' + color + (key === currentKey ? ' current' : ''), type: 'button', 'data-key': 'pick-' + key,
+              'aria-label': P.names.cardNameDe(card), onclick: () => choose(card),
+            }, `${rankText(rank)}${symbol}`);
+            btn.disabled = used.has(key) && key !== currentKey;
+            return btn;
+          }))));
+    }
+
+    function playerResult(r) {
+      const player = state.players[r.index];
+      const best = new Set(r.best5.map(cardKey));
+      const shown = [...player, ...state.board];
+      return h('div', { class: 'result-player' + (r.wins ? ' win' : '') },
+        h('div', { class: 'result-head' }, h('strong', {}, r.name), h('span', {}, r.label), r.wins ? h('span', { class: 'win-badge' }, 'Gewinner') : null),
+        h('div', { class: 'hand result-cards' }, shown.map((c, i) => h('span', { class: i === 1 ? 'hole-gap' : null }, ui.renderCard(c, best.has(cardKey(c)) ? 'best' : 'dim')))));
+    }
+
+    function resultPanel() {
+      return h('section', { class: 'panel showdown-result', 'aria-live': 'polite' },
+        h('p', { class: 'result-sentence' }, result.sentence),
+        h('p', { class: 'muted' }, result.reason),
+        h('div', { class: 'result-players' }, result.results.map(playerResult)),
+        h('p', { class: 'muted small' }, 'Hervorgehoben sind die fünf Karten, die zählen.'),
+        h('div', { class: 'actions' },
+          ui.button('Ändern', () => { result = null; draw(); }, 'btn ghost'),
+          ui.button('Neue Runde', () => { state = Sp.emptyShowdown(state.players.length); active = { kind: 'board', index: 0 }; pickerOpen = isWide(); result = null; draw(); window.scrollTo(0, 0); })));
+    }
+
+    function evaluate() {
+      const r = Sp.judgeShowdown(Sp.toShowdown(state));
+      if (!r.ok) { message = r.message; draw(); return; }
+      result = r;
+      pickerOpen = false;
+      message = '';
+      draw();
+      const panel = document.querySelector('.showdown-result');
+      if (panel) panel.scrollIntoView({ block: 'start' });
+    }
+
+    // Handy: der Auswähler ist ein Blatt am unteren Rand – der aktive Platz muss darüber sichtbar bleiben.
+    function keepActiveVisible() {
+      const slot = document.querySelector('.slot-btn.active');
+      const sheet = document.querySelector('.picker');
+      if (!slot || !sheet || window.getComputedStyle(sheet).position !== 'fixed') return;
+      const limit = sheet.getBoundingClientRect().top - 8;
+      const box = slot.getBoundingClientRect();
+      if (box.bottom > limit) window.scrollBy(0, box.bottom - limit);
+      else if (box.top < 8) window.scrollBy(0, box.top - 8);
+    }
+
+    function draw() {
+      const focusKey = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-key');
+      const n = state.players.length;
+      render(h('div', { class: 'gw' + (pickerOpen ? ' picking' : '') },
+        h('h1', {}, 'Gewinner-Check'),
+        h('p', { class: 'lead' }, 'Tippe die Karten an. Ich sage dir, wer gewinnt – und warum.'),
+        result ? resultPanel() : null,
+        h('div', { class: 'gw-grid' },
+          h('div', { class: 'gw-form' },
+            h('section', { class: 'gw-board' }, h('div', { class: 'table-label' }, 'Auf dem Tisch'),
+              h('div', { class: 'hand gw-hand' }, [0, 1, 2, 3, 4].map((index) => slotButton({ kind: 'board', index })))),
+            state.players.map((_, player) => h('div', { class: 'gw-player' },
+              h('span', { class: 'gw-name' }, `Spieler ${player + 1}`),
+              h('div', { class: 'hand gw-hand' }, [0, 1].map((index) => slotButton({ kind: 'player', player, index }))))),
+            h('div', { class: 'actions gw-controls' },
+              (() => { const b = ui.button('+ Spieler', () => { state = Sp.resizePlayers(state, n + 1); result = null; draw(); }, 'btn ghost'); b.disabled = n >= Sp.MAX_PLAYERS; return b; })(),
+              (() => { const b = ui.button('− Spieler', () => { state = Sp.resizePlayers(state, n - 1); result = null; const nxt = Sp.nextEmptySlot(state); if (active.kind === 'player' && active.player >= state.players.length) active = nxt || { kind: 'board', index: 0 }; draw(); }, 'btn ghost'); b.disabled = n <= Sp.MIN_PLAYERS; return b; })(),
+              ui.button('Alles leeren', () => { state = Sp.emptyShowdown(n); active = { kind: 'board', index: 0 }; result = null; message = ''; draw(); }, 'btn ghost')),
+            message ? h('p', { class: 'notice', role: 'alert' }, message) : null,
+            h('div', { class: 'actions' }, (() => { const b = ui.button('Auswerten', evaluate); b.disabled = !Sp.isComplete(state); return b; })())),
+          pickerOpen ? picker() : null)), { keepScroll: true });
+      if (focusKey) {
+        const again = document.querySelector(`[data-key="${focusKey}"]`);
+        const target = again && !again.disabled ? again : document.querySelector('.slot-btn.active');
+        if (target) target.focus({ preventScroll: true });
+      }
+      if (pickerOpen) keepActiveVisible();
+    }
+
+    const onKey = (event) => {
+      if (event.key === 'Escape' && pickerOpen && !isWide()) { pickerOpen = false; draw(); }
+    };
+    document.addEventListener('keydown', onKey);
+    ui.onLeave(() => document.removeEventListener('keydown', onKey));
+    draw();
+  };
 })(globalThis.Poker);
 </script>
 
