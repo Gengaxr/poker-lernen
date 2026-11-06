@@ -250,6 +250,102 @@ a.unit.open { border-color: var(--gold); }
   .card { box-shadow: none; border: 1px solid #888; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
+/* Turnier: Planer und Blinds-Uhr */
+.area-group h2 { margin: 18px 0 0; }
+.field-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 600px) { .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .field-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.field { display: grid; gap: 4px; align-content: start; min-width: 0; }
+.field-wide { grid-column: 1 / -1; }
+.field label { font-weight: 650; }
+.field input, .field select { font: inherit; min-height: 44px; width: 100%; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.25); background: rgba(0, 0, 0, 0.28); color: var(--text); padding: 8px 12px; }
+.field select option { color: #111; }
+.field .hint { color: var(--muted); font-size: 0.85rem; }
+.turnier .panel, .turnier .notice { margin: 12px 0; }
+.plan-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.plan-table th, .plan-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.plan-table .num { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.plan-table .break-row td { color: var(--gold); font-style: italic; }
+.plan-wrap { overflow-x: auto; }
+.plan-warning { background: rgba(255, 220, 130, 0.18); border: 1px solid rgba(255, 220, 130, 0.5); border-radius: 12px; padding: 10px 14px; margin: 12px 0; }
+@media (max-width: 480px) { .plan-table th, .plan-table td { padding: 6px 4px; font-size: 0.9rem; } }
+.chip-list { list-style: none; margin: 6px 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-list li { background: rgba(0, 0, 0, 0.28); border-radius: 999px; padding: 6px 14px; font-weight: 650; }
+#app.wide { max-width: none; }
+.clock-page { text-align: center; display: grid; gap: 10px; justify-items: center; padding: 8px 0 24px; }
+.clock-level { color: var(--muted); font-size: clamp(1.1rem, 1rem + 1.2vw, 2.2rem); }
+.clock-blinds { font-size: clamp(2.6rem, min(15vw, 17vh), 11rem); font-weight: 800; line-height: 1.05; color: var(--gold); font-variant-numeric: tabular-nums; }
+.clock-time { font-size: clamp(3.6rem, min(24vw, 30vh), 17rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.clock-bar { width: min(100%, 900px); height: 12px; background: rgba(255, 255, 255, 0.18); border-radius: 8px; overflow: hidden; }
+.clock-bar > span { display: block; height: 100%; background: var(--gold); }
+.clock-next { color: var(--muted); font-size: clamp(1.1rem, 1rem + 1.4vw, 2.4rem); }
+.clock-banner { width: 100%; background: var(--gold); color: #2a2208; font-weight: 800; border-radius: 14px; padding: 12px 16px; font-size: clamp(1.2rem, 1rem + 1.5vw, 2.6rem); animation: clockflash 1s ease-in-out 6; }
+@keyframes clockflash { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .clock-banner { animation: none; } }
+.clock-controls { display: grid; gap: 10px; width: min(100%, 700px); }
+.clock-toggle { min-height: 64px; font-size: 1.4rem; }
+.clock-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.clock-extras { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.clock-wake { max-width: 40em; margin: 0; }
+@media (orientation: landscape) and (max-height: 520px) { .clock-page { gap: 4px; padding-top: 0; } .clock-blinds { font-size: clamp(2rem, 18vh, 9rem); } .clock-time { font-size: clamp(3rem, 30vh, 14rem); } }
+@media print {
+  .plan-print h1, .plan-print h2 { color: #000; }
+  .plan-print .panel, .plan-print .notice { background: #fff; border: 1px solid #999; color: #000; }
+  .plan-print .plan-table th, .plan-print .plan-table td { color: #000; border-bottom: 1px solid #999; }
+  .plan-print .plan-table .break-row td { color: #333; }
+  .plan-print .chip-list li { background: #fff; border: 1px solid #999; color: #000; }
+  .plan-print .plan-table, .plan-print .chip-list { break-inside: avoid; }
+  .plan-print .muted, .plan-print .lead { color: #333; }
+  .plan-print .panel { padding: 6px 12px; margin: 6px 0; }
+  .plan-print .plan-table th, .plan-print .plan-table td { padding: 3px 8px; }
+  .plan-print h1 { font-size: 20px; margin: 0 0 4px; }
+  .plan-print h2 { font-size: 13px; margin: 0 0 4px; }
+  .plan-print p { margin: 4px 0; }
+  .plan-print .chip-list { margin: 4px 0 6px; }
+}
+
+/* Tischabend: Auslosung, Tischregeln-Zettel, Glossar */
+.field textarea { font: inherit; width: 100%; min-height: 110px; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.25); background: rgba(0, 0, 0, 0.28); color: var(--text); padding: 8px 12px; resize: vertical; }
+.draw .panel, .glossar .notice { margin: 12px 0; }
+.draw-ring { position: relative; width: min(100%, 440px); aspect-ratio: 1 / 1; margin: 12px auto 18px; border-radius: 50%; background: radial-gradient(circle at 50% 50%, var(--felt-light), var(--felt-dark)); border: 6px solid rgba(255, 255, 255, 0.14); }
+.draw-center { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255, 255, 255, 0.25); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.draw-seat { position: absolute; transform: translate(-50%, -50%); width: 27%; min-width: 0; text-align: center; font-size: 0.85rem; line-height: 1.2; }
+.draw-num { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); font-weight: 800; }
+.draw-seat.is-button .draw-num { background: var(--gold); color: #2a2208; }
+.draw-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+.draw-tag { display: block; color: var(--gold); font-size: 0.72rem; min-height: 1em; }
+.draw-list { margin: 8px 0; padding-left: 1.1em; }
+.draw-list li { margin: 4px 0; }
+.draw-result, .draw .notice { overflow-wrap: anywhere; }
+.zettel-groups { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin: 12px 0; }
+@media (min-width: 900px) { .zettel-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.zettel-group { background: var(--panel); border-radius: 14px; padding: 12px 16px; break-inside: avoid; page-break-inside: avoid; }
+.zettel-group ul { margin: 6px 0 0; padding-left: 1.2em; }
+.zettel-group li { margin: 8px 0; }
+.vote-tag { display: inline-block; margin-left: 8px; padding: 1px 9px; border-radius: 999px; background: var(--gold); color: #2a2208; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.zettel-own { margin: 0 0 12px; }
+.write-lines div { height: 2.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+.gl-search { font: inherit; font-size: 16px; min-height: 48px; width: 100%; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.3); background: rgba(0, 0, 0, 0.28); color: var(--text); padding: 8px 14px; }
+.gl-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 12px 0; }
+@media (min-width: 900px) { .gl-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.gl-letter { grid-column: 1 / -1; margin: 10px 0 0; color: var(--gold); }
+.gl-entry { background: var(--panel); border-radius: 12px; padding: 10px 14px; }
+.gl-entry h3 { margin: 0; font-size: 1.1rem; }
+.gl-en { font-weight: 400; color: var(--muted); }
+.gl-entry p { margin: 4px 0 0; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  .zettel { font-size: 10.5px; line-height: 1.3; }
+  .zettel .lead { color: #333; }
+  .zettel .zettel-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 6px 0; }
+  .zettel .zettel-group { background: #fff; border: 1px solid #999; padding: 6px 10px; }
+  .zettel .zettel-group li { margin: 4px 0; }
+  .zettel .vote-tag { background: #fff; color: #000; border: 1px solid #000; font-size: 9px; padding: 0 6px; }
+  .zettel .write-lines div { height: 1.8em; border-bottom-color: #666; }
+  .zettel h1 { font-size: 20px; margin: 0 0 4px; }
+  .zettel h2 { font-size: 12px; }
+}
+
 /* Spickzettel */
 .sheet { background: var(--panel); border-radius: 16px; padding: 14px 16px; }
 .sheet[hidden] { display: none; }
@@ -1536,6 +1632,582 @@ a.unit.open { border-color: var(--gold); }
 })(globalThis.Poker = globalThis.Poker || {});
 </script>
 
+<script id="m-turnier">
+// Turnier: Planer (Blindstufen, Pausen, Chip-Verteilung) und Blinds-Uhr. Alles rein, ohne Oberfläche; die Zeit kommt immer als Parameter.
+(function (P) {
+  const LIMITS = {
+    players: [2, 20], startChips: [500, 1000000], durationMin: [30, 720], levelMin: [5, 60], breakEvery: [0, 10], breakMin: [5, 30],
+  };
+  // Übliche Chip-Werte; jeder teilt den nächsten, damit sich jeder Betrag aus den kleineren Chips legen lässt.
+  const CHIP_LADDER = [1, 5, 25, 100, 500, 1000, 5000, 10000, 50000, 100000];
+  const MAX_CHIP_SORTS = 6;
+  const MANY_CHIPS = 40;
+  // Grundmengen je Chip-Sorte (kleinste zuerst), damit sich Beträge wechseln lassen.
+  const BASE_COUNTS = [10, 8, 5, 4, 3];
+
+  // „Schöne“ Zahlen für Blinds: 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 120 …
+  const niceNumbers = (() => {
+    const out = [1, 2, 3, 4, 5, 6, 8];
+    for (let e = 1; e <= 8; e++) for (const b of [10, 12, 15, 20, 25, 30, 40, 50, 60, 80]) out.push(b * 10 ** (e - 1));
+    return out;
+  })();
+
+  function nearestNiceIndex(x) {
+    if (!(x > 1)) return 0;
+    let best = 0;
+    let bestDist = Infinity;
+    niceNumbers.forEach((v, i) => {
+      const d = Math.abs(Math.log(v / x));
+      if (d < bestDist) { best = i; bestDist = d; }
+    });
+    return best;
+  }
+
+  const niceIndexAtLeast = (x) => { const i = niceNumbers.findIndex((v) => v >= x); return i < 0 ? niceNumbers.length - 1 : i; };
+
+  // Zahl aus einem Formularfeld: Zahl oder Text mit Zahl; alles andere ist ungültig (null).
+  function toNumber(x) {
+    if (typeof x === 'string' && x.trim() !== '') x = Number(x);
+    return typeof x === 'number' && Number.isFinite(x) ? x : null;
+  }
+  const toInt = (x) => { const n = toNumber(x); return n !== null && Number.isInteger(n) ? n : null; };
+  const fail = (error, message) => ({ ok: false, error, message });
+
+
+  // Kleinster Chip: der größte übliche Wert, der etwa ein Zweihundertstel des Stapels (kleiner Blind bei 100 großen Blinds) nicht übersteigt und den Stapel teilt.
+  function defaultChipValues(startChips) {
+    const target = startChips / 200;
+    let start = 0;
+    CHIP_LADDER.forEach((v, i) => { if (v <= target && startChips % v === 0) start = i; });
+    // Vier bis sechs Sorten: genommen wird die Auswahl, mit der der Stapel aus den wenigsten Chips besteht (größere Sorten nur, wenn sie sich lohnen).
+    let best = null;
+    let bestCount = Infinity;
+    for (let len = 4; len <= MAX_CHIP_SORTS && start + len <= CHIP_LADDER.length; len++) {
+      const values = CHIP_LADDER.slice(start, start + len);
+      if (len > 4 && values[len - 1] > startChips / 3) break;
+      const r = distributeChips(startChips, values);
+      const n = r.ok ? r.chips.reduce((sum, x) => sum + x.count, 0) : Infinity;
+      if (n < bestCount) { best = values; bestCount = n; }
+    }
+    return best || CHIP_LADDER.slice(start, start + 4);
+  }
+
+  // „25, 100 500;1.000“ → [25, 100, 500, 1000]; leer = automatisch (undefined). Punkte gelten nur als Tausenderpunkte, wenn drei Ziffern folgen.
+  function parseChipValues(text) {
+    const parts = String(text || '').split(/[\s,;]+/).filter(Boolean);
+    if (!parts.length) return undefined;
+    const nums = parts.map((x) => Number(/^\d{1,3}(\.\d{3})+$/.test(x) ? x.replace(/\./g, '') : x));
+    return [...new Set(nums)].sort((a, b) => a - b);
+  }
+
+  function validChipValues(values) {
+    return Array.isArray(values) && values.length >= 1 && values.length <= MAX_CHIP_SORTS &&
+      values.every((v, i) => Number.isInteger(v) && v >= 1 && (i === 0 || v > values[i - 1]));
+  }
+
+  // Verteilt den Startstapel auf die Chip-Sorten: Jede kleinere Sorte bekommt zuerst eine Grundmenge, damit man wechseln kann
+  // (10 · 8 · 5 · 4 …), den Rest decken die großen Sorten, der letzte Rest geht in die kleinste Sorte.
+  function distributeChips(startChips, values) {
+    const bad = () => fail('chipValues', 'Mit diesen Chip-Werten lässt sich der Startstapel nicht genau auslegen. Probiere andere Werte, zum Beispiel 25, 100, 500, 1000.');
+    if (!Number.isInteger(startChips) || startChips < 1 || !validChipValues(values)) return bad();
+    const k = values.length;
+    const counts = new Array(k).fill(0);
+    for (let i = 0; i < k - 1; i++) counts[i] = BASE_COUNTS[i];
+    const reserved = () => counts.reduce((s, n, i) => s + n * values[i], 0);
+    while (reserved() > 0.85 * startChips) { // zu wenig Platz für die Grundmengen: bei den größten Sorten anfangen zu kürzen
+      let j = k - 2;
+      while (j >= 0 && counts[j] === 0) j--;
+      if (j < 0) break;
+      counts[j]--;
+    }
+    const spread = () => {
+      const c = counts.slice();
+      let rest = startChips - c.reduce((s, n, i) => s + n * values[i], 0);
+      for (let i = k - 1; i >= 1; i--) {
+        const add = Math.floor(rest / values[i]);
+        c[i] += add;
+        rest -= add * values[i];
+      }
+      return { c, rest };
+    };
+    let { c, rest } = spread();
+    // Passt der Rest nicht in die kleinste Sorte (nur bei eigenen, nicht ineinander aufgehenden Werten): Grundmengen kürzen und neu verteilen.
+    for (let i = k - 2; i >= 0 && rest % values[0] !== 0; i--) {
+      while (counts[i] > 0 && rest % values[0] !== 0) { counts[i]--; ({ c, rest } = spread()); }
+    }
+    if (rest % values[0] !== 0) return bad();
+    c[0] += rest / values[0];
+    const chips = values.map((value, i) => ({ value, count: c[i] })).filter((x) => x.count >= 1);
+    if (!chips.length || chips[0].value !== values[0]) return bad(); // die kleinste Sorte muss vorkommen (für die Blinds)
+    return { ok: true, chips };
+  }
+
+  function planTournament(input) {
+    const src = input && typeof input === 'object' ? input : {};
+    const inRange = (n, [lo, hi]) => n !== null && n >= lo && n <= hi;
+    const players = toInt(src.players);
+    if (!inRange(players, LIMITS.players)) return fail('players', 'Gib eine Spielerzahl von 2 bis 20 ein.');
+    const startChips = toInt(src.startChips);
+    if (!inRange(startChips, LIMITS.startChips)) return fail('startChips', 'Gib einen Startstapel von 500 bis 1 000 000 Chips ein (ganze Zahl).');
+    const durationMin = toInt(src.durationMin);
+    if (!inRange(durationMin, LIMITS.durationMin)) return fail('duration', 'Die Abenddauer muss zwischen 30 Minuten und 12 Stunden liegen.');
+    const levelMin = toInt(src.levelMin);
+    if (!inRange(levelMin, LIMITS.levelMin)) return fail('levelMin', 'Eine Stufe dauert zwischen 5 und 60 Minuten.');
+    const breakEvery = src.breakEvery === undefined || src.breakEvery === null || src.breakEvery === '' ? 0 : toInt(src.breakEvery);
+    if (!inRange(breakEvery, LIMITS.breakEvery)) return fail('break', 'Eine Pause kommt nach jeder 1. bis 10. Stufe – oder gar nicht.');
+    let breakMin = 0;
+    if (breakEvery > 0) {
+      breakMin = toInt(src.breakMin);
+      if (!inRange(breakMin, LIMITS.breakMin)) return fail('break', 'Eine Pause dauert zwischen 5 und 30 Minuten.');
+    }
+
+    let values;
+    if (src.chipValues === undefined || src.chipValues === null) values = defaultChipValues(startChips);
+    else if (validChipValues(src.chipValues)) values = src.chipValues.slice();
+    else return fail('chipValues', 'Die Chip-Werte müssen ganze Zahlen sein, aufsteigend, zum Beispiel 25, 100, 500, 1000.');
+    const c = values[0];
+
+    // Wie viele Stufen passen in den Abend (Pausen eingerechnet)?
+    let nTime = 0;
+    while (true) {
+      const n = nTime + 1;
+      const used = n * levelMin + (breakEvery ? Math.floor((n - 1) / breakEvery) * breakMin : 0);
+      if (used > durationMin) break;
+      nTime = n;
+    }
+    if (nTime < 3) return fail('duration', 'Für mindestens drei Stufen ist die Zeit zu knapp. Plane mehr Zeit ein oder mache die Stufen kürzer.');
+
+    const total = players * startChips;
+    const iStart = nearestNiceIndex(startChips / 100 / (2 * c));
+    const m1 = niceNumbers[iStart];
+    const bb1 = 2 * c * m1;
+    if (startChips / bb1 < 20) return fail('tooSmall', 'Der kleinste Chip ist für diesen Startstapel zu groß: Die ersten Blinds wären zu hoch. Nimm kleinere Chips dazu.');
+
+    const growth = Math.max(2, total / 10 / bb1);
+    const iEnd = Math.max(niceIndexAtLeast(2 * m1), nearestNiceIndex(m1 * growth), iStart + 2);
+    const nLevels = Math.min(nTime, iEnd - iStart + 1);
+    const g = Math.pow(niceNumbers[iEnd] / m1, 1 / (nLevels - 1));
+    const multipliers = [m1];
+    let prev = iStart;
+    for (let k = 1; k < nLevels; k++) {
+      let idx = nearestNiceIndex(m1 * g ** k);
+      idx = Math.min(Math.max(idx, prev + 1), iEnd - (nLevels - 1 - k));
+      if (k === nLevels - 1) idx = iEnd;
+      multipliers.push(niceNumbers[idx]);
+      prev = idx;
+    }
+
+    const schedule = [];
+    const levels = [];
+    let t = 0;
+    multipliers.forEach((m, i) => {
+      const bb = 2 * c * m;
+      const level = { type: 'level', n: i + 1, sb: bb / 2, bb, minutes: levelMin, startMin: t };
+      schedule.push(level);
+      levels.push(level);
+      t += levelMin;
+      if (breakEvery && (i + 1) % breakEvery === 0 && i < multipliers.length - 1) {
+        schedule.push({ type: 'break', minutes: breakMin, startMin: t });
+        t += breakMin;
+      }
+    });
+
+    const one = distributeChips(startChips, values);
+    if (!one.ok) return one;
+    const chipsTotal = one.chips.map((x) => ({ value: x.value, count: x.count * players }));
+    const chipsPerPlayer = one.chips.reduce((s, x) => s + x.count, 0);
+    const first = levels[0];
+    const last = levels[levels.length - 1];
+    const warnings = [];
+    let biggestJump = 0;
+    for (let i = 1; i < levels.length; i++) biggestJump = Math.max(biggestJump, levels[i].bb / levels[i - 1].bb);
+    if (biggestJump > 2.5) warnings.push('Die Blinds springen zwischen manchen Stufen stark nach oben. Mit mehr Zeit oder kürzeren Stufen steigen sie gleichmäßiger.');
+    if (chipsPerPlayer > MANY_CHIPS) warnings.push(`Jeder Spieler bekommt ${chipsPerPlayer} Chips – das ist viel zu zählen. Mit größeren Chip-Werten wird das Austeilen einfacher.`);
+    if (nLevels < nTime) warnings.push('Der Plan ist kürzer als der Abend: Mehr Stufen würden die Blinds zu klein steigen lassen. Mache die Stufen länger, dann füllt der Plan den Abend.');
+    const startDepth = startChips / first.bb;
+    if (startDepth < 40) warnings.push('Die ersten Blinds sind für diesen Startstapel recht hoch. Mit kleineren Chips könnten sie niedriger beginnen.');
+
+    return {
+      ok: true, schedule, levels, chips: one.chips, chipsTotal, totalMinutes: t, smallestChip: c,
+      firstBb: first.bb, lastBb: last.bb, startBigBlinds: Math.round((startChips / first.bb) * 10) / 10,
+      endBigBlinds: Math.round((total / last.bb) * 10) / 10, warnings,
+    };
+  }
+
+  // --- Blinds-Uhr: reine Funktionen, die Zeit (now, in ms) kommt immer von außen ---
+  // Uhr = { index (Eintrag im Plan), elapsedMs (verstrichen in diesem Eintrag, ohne laufenden Teil), runningSince (ms oder null) }
+
+  const entryMs = (schedule, i) => schedule[i].minutes * 60000;
+  const createClock = () => ({ index: 0, elapsedMs: 0, runningSince: null });
+
+  // Rechnet die laufende Zeit ein, auch über mehrere Einträge hinweg (Sperre, Hintergrund, Neuladen).
+  // Ergebnis: neue Uhr (laufende Zeit ab „now“ neu verankert), crossed = betretene Einträge, finished = letzte Stufe vorbei.
+  function normalizeClock(schedule, clock, now) {
+    const last = schedule.length - 1;
+    let index = Math.min(Math.max(clock.index, 0), last);
+    let elapsed = clock.elapsedMs + (clock.runningSince === null ? 0 : Math.max(0, now - clock.runningSince));
+    const running = clock.runningSince !== null;
+    const crossed = [];
+    while (index < last && elapsed >= entryMs(schedule, index)) {
+      elapsed -= entryMs(schedule, index);
+      index++;
+      crossed.push(index);
+    }
+    if (index === last && elapsed >= entryMs(schedule, index)) {
+      return { clock: { index, elapsedMs: entryMs(schedule, index), runningSince: null }, crossed, finished: true };
+    }
+    return { clock: { index, elapsedMs: elapsed, runningSince: running ? now : null }, crossed, finished: false };
+  }
+
+  function clockView(schedule, clock, now) {
+    const { clock: c, crossed, finished } = normalizeClock(schedule, clock, now);
+    const entry = schedule[c.index];
+    const next = schedule[c.index + 1] || null;
+    const nextLevel = schedule.slice(c.index + 1).find((e) => e.type === 'level') || null;
+    return {
+      index: c.index, entry, running: c.runningSince !== null, finished, crossed,
+      elapsedMs: c.elapsedMs, remainingMs: entryMs(schedule, c.index) - c.elapsedMs, next, nextLevel,
+    };
+  }
+
+  function startClock(schedule, clock, now) {
+    if (clock.runningSince !== null) return clock;
+    const last = schedule.length - 1;
+    if (clock.index >= last && clock.elapsedMs >= entryMs(schedule, last)) return clock; // letzte Stufe vorbei: nichts zu starten
+    return { ...clock, runningSince: now };
+  }
+
+  function pauseClock(schedule, clock, now) {
+    const { clock: c } = normalizeClock(schedule, clock, now);
+    return { ...c, runningSince: null };
+  }
+
+  // delta = Einträge vor (+) oder zurück (−); die neue Stufe beginnt von vorn, Lauf oder Pause bleibt, wie sie war.
+  function jumpEntry(schedule, clock, delta, now) {
+    const { clock: c, finished } = normalizeClock(schedule, clock, now);
+    const index = Math.min(Math.max(c.index + delta, 0), schedule.length - 1);
+    if (index === c.index && !(finished && delta < 0)) return c;
+    return { index, elapsedMs: 0, runningSince: clock.runningSince !== null && !finished ? now : null };
+  }
+
+  // deltaMs ändert die RESTZEIT der aktuellen Stufe (+ = mehr Zeit); nie unter 0 und nie über die Stufenlänge.
+  function shiftTime(schedule, clock, deltaMs, now) {
+    const { clock: c } = normalizeClock(schedule, clock, now);
+    const length = entryMs(schedule, c.index);
+    const elapsed = Math.min(Math.max(c.elapsedMs - deltaMs, 0), length);
+    const wasRunning = clock.runningSince !== null;
+    return { index: c.index, elapsedMs: elapsed, runningSince: wasRunning || c.runningSince !== null ? now : null };
+  }
+
+  // --- Speicher: nur dieser eine Schlüssel; der Lernfortschritt (pokerLernspiel.v1) wird nie angefasst ---
+
+  const STORAGE_KEY = 'pokerLernspiel.turnier.v1';
+  const SETUP_KEYS = ['players', 'startChips', 'durationMin', 'levelMin', 'breakEvery', 'breakMin'];
+  const isObject = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
+  const isTime = (x) => typeof x === 'number' && Number.isFinite(x) && x >= 0;
+
+  // Eingaben des Planers, wie sie im Formular stehen (Text, kurz).
+  function cleanDraft(value) {
+    if (!isObject(value)) return null;
+    const out = {};
+    for (const key of [...SETUP_KEYS, 'chipValues']) {
+      const v = Object.prototype.hasOwnProperty.call(value, key) ? value[key] : undefined;
+      if ((typeof v === 'string' || typeof v === 'number') && String(v).length <= (key === 'chipValues' ? 120 : 40)) out[key] = String(v);
+    }
+    return Object.keys(out).length ? out : null;
+  }
+
+  // Geplantes Turnier: nur wenn der Plan stimmt und die Uhr zu ihm passt.
+  function cleanTournament(value) {
+    if (!isObject(value) || !isObject(value.setup) || !isObject(value.clock)) return null;
+    const setup = {};
+    for (const key of SETUP_KEYS) setup[key] = value.setup[key];
+    setup.chipValues = Array.isArray(value.setup.chipValues) ? value.setup.chipValues.slice() : null;
+    const planned = planTournament(setup);
+    if (!planned.ok) return null;
+    const c = value.clock;
+    if (!Number.isInteger(c.index) || c.index < 0 || c.index >= planned.schedule.length) return null;
+    if (!isTime(c.elapsedMs) || c.elapsedMs > entryMs(planned.schedule, c.index)) return null;
+    if (c.runningSince !== null && !isTime(c.runningSince)) return null;
+    const clean = {};
+    for (const key of SETUP_KEYS) clean[key] = toInt(setup[key]) === null ? (key === 'breakEvery' && !setup[key] ? 0 : null) : toInt(setup[key]);
+    clean.breakEvery = clean.breakEvery || 0;
+    clean.breakMin = clean.breakEvery ? clean.breakMin : 0;
+    clean.chipValues = setup.chipValues && validChipValues(setup.chipValues) ? setup.chipValues : null;
+    return { setup: clean, clock: { index: c.index, elapsedMs: c.elapsedMs, runningSince: c.runningSince === null ? null : c.runningSince } };
+  }
+
+  // Bereinigter Speicherinhalt oder null, wenn er nicht zu uns passt. Wirft nie.
+  function normalizeSaved(value) {
+    try {
+      if (!isObject(value) || value.v !== 1) return null;
+      return { draft: cleanDraft(value.draft), tournament: cleanTournament(value.tournament) };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function createTurnierStore(storage) {
+    const usable = !!storage && typeof storage.getItem === 'function' && typeof storage.setItem === 'function';
+    let state = { draft: null, tournament: null };
+    function write() {
+      if (!usable) return;
+      try {
+        storage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, draft: state.draft, tournament: state.tournament }));
+      } catch (e) { /* Speicher voll oder gesperrt: die Seite läuft trotzdem weiter */ }
+    }
+    function load() {
+      state = { draft: null, tournament: null };
+      if (!usable) return { draft: null, tournament: null };
+      try {
+        const raw = storage.getItem(STORAGE_KEY);
+        const parsed = raw ? normalizeSaved(JSON.parse(raw)) : null;
+        if (parsed) state = parsed;
+      } catch (e) { /* kaputter Inhalt: leer starten */ }
+      return { draft: state.draft, tournament: state.tournament };
+    }
+    load();
+    return {
+      persistent: usable,
+      load,
+      saveDraft(draft) { state.draft = cleanDraft(draft); write(); },
+      saveTournament(setup, clock) { state.tournament = cleanTournament({ setup, clock }); write(); },
+      saveClock(clock) {
+        if (!state.tournament) return;
+        state.tournament = cleanTournament({ setup: state.tournament.setup, clock }) || state.tournament;
+        write();
+      },
+      clearTournament() { state.tournament = null; write(); },
+    };
+  }
+
+  P.turnier = {
+    LIMITS, CHIP_LADDER, niceNumbers, defaultChipValues, distributeChips, planTournament,
+    parseChipValues, createClock, normalizeClock, clockView, startClock, pauseClock, jumpEntry, shiftTime, STORAGE_KEY, normalizeSaved, createTurnierStore,
+  };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
+<script id="m-tischabend">
+// Tischabend: Auslosung (Sitzplätze, Button), Tischregeln-Zettel und Glossar. Alles rein, ohne Oberfläche; Zufall kommt als Parameter.
+(function (P) {
+  const MIN_SEATS = 2;
+  const MAX_SEATS = 10;
+  const MAX_NAME_LENGTH = 24;
+
+  const fail = (error, message) => ({ ok: false, error, message });
+  const toInt = (x) => {
+    if (typeof x === 'string' && x.trim() !== '') x = Number(x);
+    return typeof x === 'number' && Number.isInteger(x) ? x : null;
+  };
+  // Zum Vergleichen: ohne Groß/Klein und Akzente, „ß“ als „ss“.
+  const foldBase = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss').toLowerCase();
+  const foldSearch = (s) => foldBase(s).replace(/[^a-z0-9]/g, '');
+
+  // --- Auslosung ---
+
+  // Namen aus einem Textfeld: getrennt an Zeilenumbruch, Komma oder Semikolon.
+  function parseNames(text) {
+    if (typeof text !== 'string') return fail('count', 'Gib 2 bis 10 Namen ein, einen pro Zeile oder mit Komma getrennt.');
+    const names = text.replace(/[\u200B-\u200D\u2060\uFEFF]/g, '').split(/[\n\r\t,;]+/).map((n) => n.trim().replace(/\s+/g, ' ')).filter(Boolean);
+    if (names.length < MIN_SEATS || names.length > MAX_SEATS) return fail('count', 'Gib 2 bis 10 Namen ein, einen pro Zeile oder mit Komma getrennt.');
+    const tooLong = names.find((n) => [...n].length > MAX_NAME_LENGTH);
+    if (tooLong) return fail('long', `Der Name „${[...tooLong].slice(0, 12).join('')}…“ ist zu lang (höchstens ${MAX_NAME_LENGTH} Zeichen).`);
+    const seen = new Set();
+    for (const n of names) {
+      const key = foldBase(n);
+      if (seen.has(key)) return fail('duplicate', `Der Name „${n}“ kommt doppelt vor. Gib jedem Spieler einen eigenen Namen.`);
+      seen.add(key);
+    }
+    return { ok: true, names };
+  }
+
+  // Plätze sind im Uhrzeigersinn nummeriert. Zu zweit (Heads-up) ist der Button der kleine Blind.
+  function blindSeats(n, button) {
+    if (n === 2) return { smallBlind: button, bigBlind: button === 1 ? 2 : 1 };
+    return { smallBlind: (button % n) + 1, bigBlind: ((button + 1) % n) + 1 };
+  }
+
+  function pickButton(n, rng) {
+    return Math.min(n, Math.floor(rng() * n) + 1);
+  }
+
+  // input: { names } (2–10 verschiedene Namen, werden gemischt) oder { count } (nur der Button wird gelost).
+  function drawSeats(input, rng) {
+    const src = input && typeof input === 'object' ? input : {};
+    let names;
+    if (src.names !== undefined && src.names !== null) {
+      names = src.names;
+      const ok = Array.isArray(names) && names.length >= MIN_SEATS && names.length <= MAX_SEATS && names.every((n) => typeof n === 'string' && n.trim() !== '') &&
+        new Set(names.map(foldBase)).size === names.length;
+      if (!ok) return fail('count', 'Gib 2 bis 10 verschiedene Namen ein.');
+      names = P.cards.shuffle(names, rng);
+    } else {
+      const count = toInt(src.count);
+      if (count === null || count < MIN_SEATS || count > MAX_SEATS) return fail('count', 'Gib eine Spielerzahl von 2 bis 10 ein.');
+      names = Array.from({ length: count }, (_, i) => `Spieler ${i + 1}`);
+    }
+    const n = names.length;
+    const button = pickButton(n, rng);
+    return { ok: true, seats: names.map((name, i) => ({ seat: i + 1, name })), button, ...blindSeats(n, button) };
+  }
+
+  function drawButton(count, rng) {
+    const n = toInt(count);
+    if (n === null || n < MIN_SEATS || n > MAX_SEATS) return fail('count', 'Gib eine Spielerzahl von 2 bis 10 ein.');
+    const button = pickButton(n, rng);
+    return { ok: true, button, ...blindSeats(n, button) };
+  }
+
+  // --- Tischregeln-Zettel (Empfehlungen für Hobbyrunden, angelehnt an die Turnierregeln der Poker TDA) ---
+  // vote: Geschmackssache – vorher abstimmen. Die Tests prüfen das Mindest-Raise-Beispiel gegen die Engine am Bot-Tisch.
+
+  const houseRules = [
+    {
+      id: 'reihenfolge', title: 'Reihenfolge am Tisch',
+      rules: [
+        { id: 'dran', vote: false, text: 'Gesetzt wird im Uhrzeigersinn. Handle erst, wenn du dran bist. Wer zu früh etwas sagt oder tut, verrät den anderen, was er vorhat.' },
+        { id: 'zu-frueh', vote: true, text: 'Wer außer der Reihe etwas ansagt, muss es in seinem Zug genauso machen – es sei denn, ein anderer hat vorher gesetzt oder erhöht. Dann darf er neu entscheiden.' },
+        { id: 'bedenkzeit', vote: true, text: 'Niemand darf ewig nachdenken. Ruft jemand „Zeit!“, hat der Spieler noch 30 Sekunden. Danach gilt Check, oder Fold, wenn gesetzt wurde.' },
+      ],
+    },
+    {
+      id: 'einsaetze', title: 'Einsätze',
+      rules: [
+        { id: 'ansage', vote: false, text: 'Was du laut sagst, gilt. „Call“, „Fold“ oder „Raise auf 100“ nimmst du nicht zurück.' },
+        { id: 'string-bet', vote: false, text: 'Setze in einer Bewegung, oder sage vorher „Raise“ und den Betrag. Chips Stück für Stück nachzuschieben (String Bet) ist nicht erlaubt: So würde man die Reaktion der anderen testen.' },
+        { id: 'mindest-raise', vote: false, text: 'Mindest-Raise: Ein Raise muss mindestens so groß sein wie der letzte Sprung, zu Beginn einer Runde mindestens ein großer Blind. Beispiel bei 20 großem Blind: Erhöht jemand auf 60 (Sprung 40), geht der nächste Raise auf mindestens 100.' },
+        { id: 'all-in-klein', vote: false, text: 'Ein All-in darf kleiner sein als der Mindest-Raise. Du darfst immer alle deine Chips setzen. Ist es kleiner als ein voller Raise, dürfen Spieler, die schon gehandelt haben, nur noch mitgehen oder aussteigen – nicht erneut erhöhen.' },
+        { id: 'check-raise', vote: false, text: 'Check und später Raise (Check-Raise) ist erlaubt: Wer zuerst checkt und dann hört, dass jemand gesetzt hat, darf noch erhöhen.' },
+      ],
+    },
+    {
+      id: 'karten', title: 'Karten und Showdown',
+      rules: [
+        { id: 'karten-verdeckt', vote: false, text: 'Zeige deine Karten nicht, solange die Hand läuft. Wer ausgestiegen ist, wirft sie verdeckt weg (Muck) und kommentiert nichts.' },
+        { id: 'aufdecken-reihenfolge', vote: false, text: 'Am Showdown deckt zuerst auf, wer zuletzt gesetzt oder erhöht hat. Gab es in der letzten Runde keinen Einsatz, beginnt der erste Spieler links vom Button.' },
+        { id: 'karten-sprechen', vote: false, text: 'Karten sprechen: Es zählen die aufgedeckten Karten, nicht, was jemand dazu sagt. Wer die bessere Hand hat, gewinnt – auch wenn er sie falsch nennt oder gar nicht erkennt.' },
+        { id: 'kein-showdown', vote: false, text: 'Haben alle anderen aufgegeben, gewinnt der letzte Spieler den Pot, ohne seine Karten zu zeigen.' },
+      ],
+    },
+    {
+      id: 'geben', title: 'Geben und Fehler',
+      rules: [
+        { id: 'geber', vote: false, text: 'Der Button wandert nach jeder Hand einen Platz nach links (im Uhrzeigersinn). Wer den Button hat, gibt die Karten – oder bestimmt, wer für ihn gibt.' },
+        { id: 'brennkarte', vote: true, text: 'Brennkarte: Vor Flop, Turn und River legt der Geber eine Karte verdeckt ab. Das ist Geschmackssache und wird am Küchentisch oft weggelassen. Einigt euch vorher.' },
+        { id: 'falsch-gegeben', vote: false, text: 'Fehler beim Geben (eine Karte liegt offen, eine fehlt, falsche Reihenfolge): Hat noch niemand gehandelt (die Blinds zählen nicht), wird neu gemischt und neu gegeben. Sonst wird weitergespielt.' },
+      ],
+    },
+    {
+      id: 'chips', title: 'Chips und Pot',
+      rules: [
+        { id: 'chips-sichtbar', vote: false, text: 'Dein Stapel muss für alle sichtbar und zählbar sein. Wer nach deinem Stapel fragt, bekommt eine ehrliche Antwort.' },
+        { id: 'ungerader-chip', vote: false, text: 'Bleibt beim Teilen eines Pots ein Chip übrig (der ungerade Chip), bekommt ihn der Gewinner, der zuerst links vom Button sitzt.' },
+        { id: 'nur-tischchips', vote: false, text: 'Es zählen nur Chips, die vor Beginn der Hand auf dem Tisch liegen. Chips aus der Tasche oder frisch nachgekaufte Chips kommen erst in der nächsten Hand ins Spiel.' },
+        { id: 'neukauf', vote: true, text: 'Neukauf (Rebuy): Wer alle Chips verloren hat, darf nur neu einsteigen, wenn ihr das vorher abgesprochen habt – und bis wann.' },
+      ],
+    },
+    {
+      id: 'verhalten', title: 'Verhalten am Tisch',
+      rules: [
+        { id: 'handy', vote: true, text: 'Handy weg, wenn du in der Hand bist. Muss jemand etwas nachschauen, sagt er es vorher an.' },
+        { id: 'kein-kommentar', vote: false, text: 'Keine Tipps und keine Kommentare zu laufenden Händen („Ich hätte …“). Wer nicht mehr dabei ist, bleibt still.' },
+        { id: 'streit', vote: false, text: 'Bei Streit entscheidet ein Spielleiter, den ihr vorher bestimmt. Seine Entscheidung gilt, dann wird weitergespielt. Der Gewinner-Check in dieser App zeigt, wer die beste Hand hat.' },
+      ],
+    },
+  ];
+
+  // --- Glossar ---
+  // term: deutscher oder englischer Begriff, en: englisches Wort (bei deutschen Begriffen), alt: anderer Name. Die Handränge tragen die Namen aus dem Training.
+
+  const glossary = [
+    { term: 'Aggressor', en: '', alt: 'letzter Erhöher', text: 'Der Spieler, der in einer Setzrunde zuletzt gesetzt oder erhöht hat. Am Showdown deckt er zuerst auf.' },
+    { term: 'All-in', en: '', alt: 'alles setzen', text: 'Du setzt alle deine Chips. Danach musst du nichts mehr entscheiden und bist bis zum Showdown dabei. Von jedem Gegner kannst du höchstens so viel gewinnen, wie du selbst gesetzt hast.' },
+    { term: 'Bet', en: '', alt: 'setzen', text: 'Der erste Einsatz in einer Setzrunde. Vorher hat niemand gesetzt. Die anderen können mitgehen, erhöhen oder aufgeben.' },
+    { term: 'Big Blind', en: '', alt: 'großer Blind', text: 'Der große Pflichteinsatz. Der Spieler zwei Plätze links vom Button zahlt ihn vor dem Austeilen (zu zweit: siehe Heads-up). Er ist doppelt so hoch wie der kleine Blind.' },
+    { term: 'Blindstufe', en: 'Level', alt: 'Stufe', text: 'Im Turnier gelten die Blinds für eine feste Zeit. Danach beginnt die nächste Stufe mit höheren Blinds, damit das Turnier ein Ende findet.' },
+    { term: 'Blinds', en: '', alt: 'Pflichteinsätze', text: 'Pflichteinsätze, die vor dem Austeilen in die Mitte kommen: erst der kleine, dann der große Blind. So gibt es in jeder Hand etwas zu gewinnen.' },
+    { term: 'Bluff', en: '', alt: '', text: 'Du setzt, als hättest du eine starke Hand, obwohl deine Hand schwach ist. Die anderen sollen aufgeben. Wer zu oft blufft, wird durchschaut.' },
+    { term: 'Board', en: '', alt: 'Tischkarten', text: 'Die offenen Gemeinschaftskarten in der Mitte: Flop, Turn und River, zusammen bis zu fünf Karten. Alle Spieler benutzen dieselben Karten.' },
+    { term: 'Brennkarte', en: 'Burn Card', alt: '', text: 'Der Geber legt vor Flop, Turn und River eine Karte verdeckt ab, damit niemand die kommenden Karten kennen kann. Am Küchentisch lässt man sie oft weg.' },
+    { term: 'Button', en: '', alt: 'Dealer-Knopf', text: 'Ein Markierungsstein, der den Geber anzeigt. Der Spieler mit dem Button handelt nach dem Flop als Letzter. Nach jeder Hand wandert er einen Platz nach links.' },
+    { term: 'Call', en: '', alt: 'mitgehen', text: 'Du legst so viel nach, dass du gleich viel im Pot hast wie der Spieler, der gesetzt hat. Du bleibst in der Hand, der Einsatz wird nicht größer.' },
+    { term: 'Check', en: '', alt: 'schieben', text: 'Du setzt nichts und gibst das Wort weiter. Das geht nur, wenn vor dir noch niemand gesetzt hat. Du bleibst in der Hand.' },
+    { term: 'Check-Raise', en: '', alt: '', text: 'Erst Check, und wenn danach jemand setzt, Raise. Das ist erlaubt und zeigt oft eine starke Hand – oder einen Bluff.' },
+    { term: 'Chipleader', en: 'Chip Leader', alt: '', text: 'Der Spieler mit den meisten Chips im Turnier. Er kann den anderen mit großen Einsätzen Druck machen.' },
+    { term: 'Draw', en: '', alt: '', text: 'Eine noch unfertige Hand: Dir fehlt eine Karte zur Straße oder zum Flush. Die Karten, die dir helfen, heißen Outs.' },
+    { term: 'Drilling', en: 'Three of a Kind', alt: '', text: 'Drei Karten mit demselben Rang, zum Beispiel drei Damen. Die zwei übrigen Karten passen zu nichts.' },
+    { term: 'Flop', en: '', alt: '', text: 'Die ersten drei offenen Karten in der Mitte. Danach folgt eine Setzrunde.' },
+    { term: 'Flush', en: 'Flush', alt: '', text: 'Fünf Karten derselben Farbe. Sie müssen nicht in einer Reihe liegen. Mit einer Reihe wäre es ein Straight Flush.' },
+    { term: 'Flush-Draw', en: '', alt: '', text: 'Vier Karten einer Farbe, die fünfte fehlt noch. Von den 13 Karten dieser Farbe sind neun unbekannt: Das sind 9 Outs.' },
+    { term: 'Fold', en: '', alt: 'aussteigen', text: 'Du wirfst deine Karten weg und gibst die Hand auf. Was du schon in den Pot gelegt hast, bleibt dort.' },
+    { term: 'Full House', en: 'Full House', alt: '', text: 'Ein Drilling und ein Paar zusammen, zum Beispiel drei Damen und zwei Siebener.' },
+    { term: 'Gutshot', en: '', alt: '', text: 'Dir fehlt nur eine Karte in der Mitte einer Reihe. Vier Karten helfen dir, das sind 4 Outs.' },
+    { term: 'Heads-up', en: '', alt: 'zu zweit', text: 'Ein Spiel zu zweit. Der Button ist zugleich der kleine Blind und handelt vor dem Flop zuerst, danach als Letzter. Der andere Spieler zahlt den großen Blind.' },
+    { term: 'Hohe Karte', en: 'High Card', alt: '', text: 'Keine der anderen Kombinationen. Dann zählt die höchste Karte. Das ist die schwächste Hand.' },
+    { term: 'Hole Cards', en: '', alt: 'Handkarten, Starthand', text: 'Deine zwei verdeckten Karten, die nur du kennst. Mit den Karten in der Mitte bildest du deine beste Hand.' },
+    { term: 'Kicker', en: '', alt: 'Zusatzkarte', text: 'Der Kicker (Zusatzkarte) ist eine Karte, die nicht zur Kombination gehört, aber bei Gleichstand zählt. Haben beide ein Paar Könige, gewinnt die höhere übrige Karte.' },
+    { term: 'Mindest-Raise', en: '', alt: '', text: 'Ein Raise muss mindestens so groß sein wie der letzte Sprung in dieser Runde, am Anfang mindestens ein großer Blind.' },
+    { term: 'Muck', en: '', alt: 'ablegen', text: 'Karten verdeckt auf den Ablagestapel legen, ohne sie zu zeigen. Wer aussteigt, muckt seine Karten.' },
+    { term: 'Nuts', en: '', alt: '', text: 'Die bestmögliche Hand, die mit den Karten auf dem Tisch gerade denkbar ist. Niemand kann dich schlagen.' },
+    { term: 'Outs', en: '', alt: '', text: 'Karten, die dir noch zur besseren Hand fehlen. Ein Flush-Draw hat 9 Outs, eine offene Straße 8, ein Gutshot 4.' },
+    { term: 'Paar', en: 'Pair', alt: '', text: 'Zwei Karten mit demselben Rang, zum Beispiel zwei Könige. Die drei übrigen Karten passen zu nichts.' },
+    { term: 'Position', en: '', alt: '', text: 'Wo du am Tisch im Vergleich zum Button sitzt. Wer später handelt, weiß mehr. Am Button handelst du nach dem Flop als Letzter.' },
+    { term: 'Pot', en: '', alt: '', text: 'Alle Chips, die in der Mitte liegen. Wer die Hand gewinnt, bekommt sie.' },
+    { term: 'Pot Odds', en: '', alt: '', text: 'Der Preis eines Calls: dein Call geteilt durch den Pot plus deinen Call, in Prozent. Ein Call lohnt sich, wenn deine Chance mindestens so groß ist.' },
+    { term: 'Preflop', en: '', alt: '', text: 'Die Setzrunde vor dem Flop, nachdem jeder seine zwei Karten bekommen hat.' },
+    { term: 'Raise', en: '', alt: 'erhöhen', text: 'Du setzt mehr als den letzten Einsatz. Die anderen müssen mindestens so viel zahlen oder aufgeben.' },
+    { term: 'Rebuy', en: '', alt: 'Neukauf', text: 'Im Turnier: Neue Chips kaufen, nachdem man alle verloren hat. Das geht nur, wenn alle es vorher so vereinbart haben.' },
+    { term: 'River', en: '', alt: '', text: 'Die fünfte und letzte offene Karte in der Mitte. Danach kommt die letzte Setzrunde.' },
+    { term: 'Royal Flush', en: 'Royal Flush', alt: '', text: 'Zehn, Bube, Dame, König und Ass in derselben Farbe. Der beste Straight Flush und die beste Hand überhaupt.' },
+    { term: 'Setzrunde', en: 'Betting Round', alt: '', text: 'Ein Abschnitt, in dem reihum gesetzt wird: vor dem Flop, nach dem Flop, nach dem Turn und nach dem River.' },
+    { term: 'Showdown', en: '', alt: '', text: 'Am Ende der Hand decken die Spieler, die noch dabei sind, ihre Karten auf. Die beste Hand aus fünf Karten gewinnt den Pot.' },
+    { term: 'Side Pot', en: '', alt: 'Nebenpot', text: 'Ist jemand mit weniger Chips All-in, setzen die anderen in einem zweiten Pot weiter. Jeder kann nur die Pots gewinnen, in die er eingezahlt hat.' },
+    { term: 'Small Blind', en: '', alt: 'kleiner Blind', text: 'Der kleine Pflichteinsatz. Der Spieler direkt links vom Button zahlt ihn vor dem Austeilen (zu zweit: siehe Heads-up). Er ist halb so hoch wie der große Blind.' },
+    { term: 'Stack', en: '', alt: 'Chipstapel', text: 'Alle Chips, die ein Spieler vor sich hat.' },
+    { term: 'Straight Flush', en: 'Straight Flush', alt: '', text: 'Fünf Karten in einer Reihe, alle in derselben Farbe.' },
+    { term: 'Straße', en: 'Straight', alt: '', text: 'Fünf Karten in einer Reihe, die Farben sind egal. Das Ass zählt ganz oben oder ganz unten (Ass bis Fünf).' },
+    { term: 'String Bet', en: '', alt: '', text: 'Chips in mehreren Portionen vorschieben, ohne vorher zu sagen, wie viel. Das ist verboten, weil man so die Reaktion der anderen testen könnte.' },
+    { term: 'Tilt', en: '', alt: '', text: 'Wer sich geärgert hat und deshalb unüberlegt und schlecht spielt, ist auf Tilt.' },
+    { term: 'Turn', en: '', alt: '', text: 'Die vierte offene Karte in der Mitte. Danach folgt eine Setzrunde.' },
+    { term: 'Under the Gun', en: '', alt: 'UTG', text: 'Der erste Spieler, der vor dem Flop an der Reihe ist: links vom großen Blind (zu zweit: siehe Heads-up).' },
+    { term: 'Vierling', en: 'Four of a Kind', alt: '', text: 'Vier Karten mit demselben Rang.' },
+    { term: 'Zwei Paare', en: 'Two Pair', alt: '', text: 'Zwei verschiedene Paare, zum Beispiel Könige und Siebener, plus eine fünfte Karte, die zu nichts passt.' },
+  ].sort((a, b) => a.term.localeCompare(b.term, 'de', { sensitivity: 'base' }));
+
+  // Suche: ohne Groß/Klein, Akzente, Leer- und Bindestriche; alle Wörter müssen vorkommen. Treffer im Begriff zuerst.
+  // Findet die genaue Schreibweise nichts, werden Doppelbuchstaben zusammengezogen („Flopp“ findet „Flop“) – aber nur bei Wörtern ab drei Buchstaben.
+  const collapse = (s) => s.replace(/(.)\1+/g, '$1');
+  const queryTokens = (query) => (typeof query === 'string' ? query.split(/\s+/).map(foldSearch).filter(Boolean) : []);
+  const hasSearchTerms = (query) => queryTokens(query).length > 0;
+
+  function rankMatches(tokens, mapText) {
+    const whole = tokens.join('');
+    const scored = [];
+    glossary.forEach((entry, index) => {
+      const term = mapText(foldSearch(entry.term));
+      const other = mapText(foldSearch(`${entry.en} ${entry.alt}`));
+      const hay = `${term}${other}${mapText(foldSearch(entry.text))}`;
+      if (!tokens.every((t) => hay.includes(t))) return;
+      const score = term === whole ? 0 : term.startsWith(whole) ? 1 : tokens.every((t) => term.includes(t)) ? 2 : tokens.every((t) => (term + other).includes(t)) ? 3 : 4;
+      scored.push({ entry, score, index });
+    });
+    return scored.sort((a, b) => a.score - b.score || a.index - b.index).map((x) => x.entry);
+  }
+
+  function searchGlossary(query) {
+    const tokens = queryTokens(query);
+    if (!tokens.length) return glossary.slice();
+    const exact = rankMatches(tokens, (x) => x);
+    if (exact.length) return exact;
+    const loose = tokens.map(collapse);
+    return loose.every((t) => t.length >= 3) ? rankMatches(loose, collapse) : [];
+  }
+
+  P.tischabend = { MIN_SEATS, MAX_SEATS, parseNames, blindSeats, drawSeats, drawButton, houseRules, glossary, searchGlossary, hasSearchTerms };
+})(globalThis.Poker = globalThis.Poker || {});
+</script>
+
 <script id="m-analysis">
 // Einschätzung von Starthänden und Händen mit Board – für die Bots und den Coach.
 (function (P) {
@@ -2451,7 +3123,7 @@ a.unit.open { border-color: var(--gold); }
     return el;
   }
 
-  const state = { store: null, rng: Math.random, root: null, layout: null, main: null, sheet: null, sheetBtn: null, recoveredShown: false, flash: null };
+  const state = { store: null, storage: null, rng: Math.random, root: null, layout: null, main: null, sheet: null, sheetBtn: null, recoveredShown: false, flash: null };
   const unitRunners = {}; // unitId -> function(unitId); tragen die Blöcke m-ui-stage* ein
 
   // --- Karten ---
@@ -2633,7 +3305,7 @@ a.unit.open { border-color: var(--gold); }
           href: '#/table', symbol: '♦', title: 'Bot-Tisch', locked: !state.store.isTableUnlocked(),
           text: state.store.isTableUnlocked() ? 'Spiele gegen drei Bots – mit Coach' : 'Schließe Stufe 2 ab, dann schaltet sich der Tisch frei',
         }),
-        areaTile({ href: '#/spielabend', symbol: '♣', title: 'Spielabend', text: 'Handränge-Tafel, Regelwerk und Gewinner-Check für deine Runde mit Freunden' })),
+        areaTile({ href: '#/spielabend', symbol: '♣', title: 'Spielabend', text: 'Handränge-Tafel, Regelwerk, Gewinner-Check, Turnier-Uhr, Auslosung, Tischregeln und Glossar für deine Runde mit Freunden' })),
       ui.renderBackup ? ui.renderBackup() : null,
       h('div', { class: 'footer-actions' }, reset)), { sheet: false });
   }
@@ -2646,16 +3318,45 @@ a.unit.open { border-color: var(--gold); }
       h('ol', { class: 'path' }, Prog.UNIT_ORDER.map(unitRow))), { sheet: false, back: true });
   }
 
-  // Spielabend: Auswahl der Hilfen. Die Unterseiten tragen sich selbst in `pages` ein (Schlüssel = Adresse ohne „#/“).
+  // Spielabend: Auswahl der Hilfen in Gruppen. Die Unterseiten tragen sich selbst in `pages` ein (Schlüssel = Adresse ohne „#/“).
   const pages = {};
+  const SPIELABEND_SECTIONS = [
+    {
+      title: 'Zum Erklären',
+      tiles: [
+        { href: '#/spielabend/haende', symbol: '♥', title: 'Handränge-Tafel', text: 'Alle zehn Hände groß, mit Beispielen und Gleichstand-Regeln – auch zum Ausdrucken.' },
+        { href: '#/spielabend/regeln', symbol: '♠', title: 'Regelwerk', text: 'So läuft eine Runde – Seite für Seite zum Vorführen.' },
+        { href: '#/spielabend/gewinner', symbol: '♣', title: 'Gewinner-Check', text: 'Karten eingeben und sehen, wer gewinnt – und warum.' },
+      ],
+    },
+    {
+      title: 'Turnier',
+      tiles: [
+        { href: '#/spielabend/turnier', symbol: '♦', title: 'Turnier-Planer', text: 'Spielerzahl und Startchips eingeben – ich rechne Blindstufen, Pausen und Chip-Verteilung aus.' },
+        { href: '#/spielabend/uhr', symbol: '♠', title: 'Blinds-Uhr', text: 'Die Uhr für den Abend: große Anzeige, steigende Blinds, auch am Fernseher.' },
+      ],
+    },
+    {
+      title: 'Am Tisch',
+      tiles: [
+        { href: '#/spielabend/auslosung', symbol: '♥', title: 'Sitzplatz-Auslosung', text: 'Plätze und Button auslosen – gerecht und mit einem Tipp.' },
+        { href: '#/spielabend/tischregeln', symbol: '♣', title: 'Tischregeln', text: 'Ein Zettel mit den Regeln, über die Freunde gern streiten – zum Zeigen oder Ausdrucken.' },
+      ],
+    },
+    {
+      title: 'Nachschlagen',
+      tiles: [
+        { href: '#/spielabend/glossar', symbol: '♦', title: 'Glossar', text: 'Die Fachwörter vom Pokertisch in einfachen Worten, mit Suche.' },
+      ],
+    },
+  ];
   pages.spielabend = () => {
     show(h('div', {},
       h('h1', {}, 'Spielabend'),
       h('p', { class: 'lead' }, 'Hilfen für eure Runde. Hier musst du nichts freischalten – den Link zu diesem Bereich kannst du auch an Freunde weitergeben.'),
-      h('div', { class: 'areas' },
-        areaTile({ href: '#/spielabend/haende', symbol: '♥', title: 'Handränge-Tafel', text: 'Alle zehn Hände groß, mit Beispielen und Gleichstand-Regeln – auch zum Ausdrucken.' }),
-        areaTile({ href: '#/spielabend/regeln', symbol: '♠', title: 'Regelwerk', text: 'So läuft eine Runde – Seite für Seite zum Vorführen.' }),
-        areaTile({ href: '#/spielabend/gewinner', symbol: '♣', title: 'Gewinner-Check', text: 'Karten eingeben und sehen, wer gewinnt – und warum.' }))), { sheet: false, back: true });
+      SPIELABEND_SECTIONS.map((section) => h('section', { class: 'area-group' },
+        h('h2', {}, section.title),
+        h('div', { class: 'areas' }, section.tiles.map(areaTile))))), { sheet: false, back: true });
   };
 
   // Aufräum-Funktionen der aktuellen Seite (Tastatur, Vollbild …): route() führt sie vor jeder neuen Seite aus.
@@ -2724,6 +3425,7 @@ a.unit.open { border-color: var(--gold); }
   function start(root, deps) {
     state.root = root;
     state.rng = deps.rng;
+    state.storage = deps.storage;
     state.store = Prog.createProgressStore(deps.storage);
     window.addEventListener('hashchange', route);
     document.addEventListener('keydown', (event) => {
@@ -3705,6 +4407,547 @@ a.unit.open { border-color: var(--gold); }
     document.addEventListener('keydown', onKey);
     ui.onLeave(() => document.removeEventListener('keydown', onKey));
     draw();
+  };
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-turnier">
+// Turnier: Planer (Formular mit sofortiger Vorschau) und Blinds-Uhr. Die Seiten tragen sich in ui.pages ein (Adresse ohne „#/“).
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const T = P.turnier;
+
+  const fmt = (n) => { try { return new Intl.NumberFormat('de-DE').format(n); } catch (e) { return String(n); } };
+  const blinds = (e) => `${fmt(e.sb)} / ${fmt(e.bb)}`;
+  const pad = (n) => String(n).padStart(2, '0');
+  const hoursMinutes = (min) => { const hh = Math.floor(min / 60); const mm = min % 60; return hh ? (mm ? `${hh} Std. ${mm} Min.` : `${hh} Std.`) : `${mm} Min.`; };
+  const clockMinute = (min) => `${Math.floor(min / 60)}:${pad(min % 60)}`;
+  const clockText = (ms) => {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const hh = Math.floor(s / 3600);
+    return hh ? `${hh}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}` : `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+  };
+
+  let store = null;
+  const turnierStore = () => store || (store = T.createTurnierStore(ui.state.storage));
+  ui.turnierStore = turnierStore;
+
+  function entryLabel(view) {
+    if (view.finished) return 'Letzte Stufe vorbei';
+    return view.entry.type === 'break' ? 'Pause' : `Stufe ${view.entry.n} (${blinds(view.entry)})`;
+  }
+
+  // --- Planer ---
+
+  const DEFAULT_FORM = { players: '8', startChips: '5000', durationMin: '180', levelMin: '15', breakEvery: '4', breakMin: '10', chipValues: '' };
+  const DURATIONS = [60, 90, 120, 150, 180, 240, 300, 360, 480];
+  const LEVEL_MINUTES = [10, 15, 20, 30];
+  const BREAK_EVERY = [0, 3, 4, 5, 6];
+  const BREAK_MINUTES = [5, 10, 15, 20];
+
+  const parseChipValues = T.parseChipValues;
+
+  const formInput = (form) => ({
+    players: form.players, startChips: form.startChips, durationMin: form.durationMin, levelMin: form.levelMin,
+    breakEvery: form.breakEvery, breakMin: form.breakMin, chipValues: parseChipValues(form.chipValues),
+  });
+
+  ui.pages['spielabend/turnier'] = () => {
+    const st = turnierStore();
+    const saved = st.load();
+    const form = { ...DEFAULT_FORM, ...(saved.draft || {}) };
+    for (const key of ['durationMin', 'levelMin', 'breakEvery', 'breakMin']) if (!Number.isFinite(Number(form[key])) || form[key] === '') form[key] = DEFAULT_FORM[key];
+    let plan = null;
+    const resultBox = h('div', { class: 'plan-result' });
+    const startBtn = ui.button('Uhr starten', startTournament);
+
+    function changed() {
+      st.saveDraft(form);
+      recompute();
+    }
+
+    function numberField(key, label, hint, attrs) {
+      const input = h('input', {
+        type: 'number', inputmode: 'numeric', id: 'f-' + key, value: form[key], ...attrs,
+        oninput: (event) => { form[key] = event.target.value; changed(); },
+      });
+      return h('div', { class: 'field' }, h('label', { for: 'f-' + key }, label), input, hint ? h('div', { class: 'hint' }, hint) : null);
+    }
+
+    function selectField(key, label, values, text, hint) {
+      const current = Number(form[key]);
+      const list = values.includes(current) ? values : [...values, current].sort((a, b) => a - b);
+      const select = h('select', { id: 'f-' + key, onchange: (event) => { form[key] = event.target.value; changed(); } },
+        list.map((v) => h('option', { value: String(v), selected: v === current }, text(v))));
+      return h('div', { class: 'field' }, h('label', { for: 'f-' + key }, label), select, hint ? h('div', { class: 'hint' }, hint) : null);
+    }
+
+    const chipsField = h('div', { class: 'field field-wide' },
+      h('label', { for: 'f-chipValues' }, 'Eure Chip-Werte (leer lassen für automatisch)'),
+      h('input', {
+        type: 'text', inputmode: 'numeric', id: 'f-chipValues', value: form.chipValues, placeholder: 'zum Beispiel 25, 100, 500, 1000', autocomplete: 'off',
+        oninput: (event) => { form.chipValues = event.target.value; changed(); },
+      }),
+      h('div', { class: 'hint' }, 'Der kleinste Wert bestimmt die kleinsten Blinds. Ohne Eingabe nehme ich übliche Pokerchips.'));
+
+    function startTournament() {
+      if (!plan || !plan.ok) return;
+      const existing = st.load().tournament;
+      const used = existing && (existing.clock.index > 0 || existing.clock.elapsedMs > 0 || existing.clock.runningSince !== null);
+      if (used && !window.confirm('Die bisherige Uhr wird durch diesen Plan ersetzt. Weiter?')) return;
+      st.saveTournament({ ...formInput(form), chipValues: parseChipValues(form.chipValues) || null }, T.createClock());
+      window.location.hash = '#/spielabend/uhr';
+    }
+
+    function resultView(p) {
+      const breaks = p.schedule.filter((e) => e.type === 'break').length;
+      const first = p.levels[0];
+      const last = p.levels[p.levels.length - 1];
+      const players = Number(form.players);
+      return h('div', {},
+        p.warnings.map((w) => h('p', { class: 'plan-warning' }, w)),
+        h('section', { class: 'panel plan-summary' },
+          h('h2', {}, 'Dein Plan'),
+          h('p', {}, `${players} Spieler, jeder startet mit ${fmt(Number(form.startChips))} Chips. Der Abend dauert etwa ${hoursMinutes(p.totalMinutes)}: ${p.levels.length} Stufen${breaks ? ` und ${breaks} ${breaks === 1 ? 'Pause' : 'Pausen'}` : ''}.`),
+          h('p', {}, `Los geht es mit ${blinds(first)}: Jeder Spieler hat dann so viele Chips wie ${fmt(p.startBigBlinds)} große Blinds. Zum Schluss steht ${blinds(last)}. Dann sind die Blinds so hoch, dass alle Chips am Tisch zusammen nur noch etwa ${fmt(p.endBigBlinds)} große Blinds ergeben – das Turnier ist dann schnell entschieden.`)),
+        h('section', { class: 'panel' },
+          h('h2', {}, 'Die Stufen'),
+          h('div', { class: 'plan-wrap' }, h('table', { class: 'plan-table' },
+            h('caption', { class: 'sr' }, 'Blindstufen'),
+            h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, 'Stufe'), h('th', { scope: 'col' }, 'Blinds'), h('th', { scope: 'col' }, 'Dauer'), h('th', { scope: 'col' }, 'Ab'))),
+            h('tbody', {}, p.schedule.map((e) => (e.type === 'break'
+              ? h('tr', { class: 'break-row' }, h('td', { colspan: 2 }, 'Pause'), h('td', {}, `${e.minutes} Min.`), h('td', {}, clockMinute(e.startMin)))
+              : h('tr', {}, h('td', {}, String(e.n)), h('td', { class: 'num' }, blinds(e)), h('td', {}, `${e.minutes} Min.`), h('td', {}, clockMinute(e.startMin)))))))),
+          h('p', { class: 'muted small' }, '„Blinds“ nennt den kleinen und den großen Blind. „Ab“ zeigt, wie viele Stunden und Minuten nach dem Start die Stufe beginnt.')),
+        h('section', { class: 'panel' },
+          h('h2', {}, 'Chips'),
+          h('p', {}, `Jeder Spieler bekommt (zusammen ${fmt(Number(form.startChips))} Chips):`),
+          h('ul', { class: 'chip-list' }, p.chips.map((c) => h('li', {}, `${c.count} × ${fmt(c.value)}`))),
+          h('p', {}, `Für alle ${players} Spieler zusammen brauchst du:`),
+          h('ul', { class: 'chip-list' }, p.chipsTotal.map((c) => h('li', {}, `${c.count} × ${fmt(c.value)}`)))));
+    }
+
+    function recompute() {
+      plan = T.planTournament(formInput(form));
+      resultBox.replaceChildren(plan.ok ? resultView(plan) : h('p', { class: 'notice', role: 'alert' }, plan.message));
+      startBtn.disabled = !plan.ok;
+    }
+
+    // Läuft schon eine Uhr? Dann gibt es einen Weg zurück zu ihr.
+    function runningPanel() {
+      const t = saved.tournament;
+      if (!t) return null;
+      const p = T.planTournament(t.setup);
+      if (!p.ok) return null;
+      const view = T.clockView(p.schedule, t.clock, Date.now());
+      return h('section', { class: 'panel no-print' },
+        h('p', {}, `Deine Uhr ist eingerichtet: ${entryLabel(view)}.`),
+        h('a', { class: 'btn ghost', href: '#/spielabend/uhr' }, 'Zur Uhr'));
+    }
+
+    ui.show(h('div', { class: 'turnier plan-print' },
+      h('h1', {}, 'Turnier-Planer'),
+      h('p', { class: 'lead no-print' }, 'Sag mir, wie viele ihr seid und wie lange der Abend dauern soll. Ich rechne die Blinds aus – das sind die Pflichteinsätze (kleiner und großer Blind), die Stufe für Stufe steigen, damit das Turnier ein Ende findet.'),
+      runningPanel(),
+      h('section', { class: 'panel turnier-form no-print' },
+        h('div', { class: 'field-grid' },
+          numberField('players', 'Spieler', 'Zwischen 2 und 20.', { min: '2', max: '20', step: '1' }),
+          numberField('startChips', 'Startchips pro Spieler', 'Zum Beispiel 5000.', { min: '500', max: '1000000', step: '500' }),
+          selectField('durationMin', 'Wie lange soll der Abend dauern?', DURATIONS, hoursMinutes, 'Die Pausen sind eingerechnet.'),
+          selectField('levelMin', 'Eine Stufe dauert', LEVEL_MINUTES, (v) => `${v} Minuten`, 'So lange gelten dieselben Blinds.'),
+          selectField('breakEvery', 'Pause', BREAK_EVERY, (v) => (v ? `nach jeder ${v}. Stufe` : 'keine Pause')),
+          selectField('breakMin', 'Länge der Pause', BREAK_MINUTES, (v) => `${v} Minuten`),
+          chipsField)),
+      resultBox,
+      h('div', { class: 'actions no-print' }, startBtn, ui.button('Drucken', () => window.print(), 'btn ghost'))), { sheet: false, back: true });
+    recompute();
+  };
+
+  // --- Blinds-Uhr ---
+
+  function makeBeeper() {
+    let ctx = null;
+    return {
+      unlock() {
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return false;
+          ctx = ctx || new Ctx();
+          if (ctx.state === 'suspended') ctx.resume();
+          return true;
+        } catch (e) { return false; }
+      },
+      beep() {
+        if (!ctx) return;
+        try {
+          if (ctx.state === 'suspended') ctx.resume();
+          [0, 0.35, 0.7].forEach((offset) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 880;
+            gain.gain.value = 0.2;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + offset);
+            osc.stop(ctx.currentTime + offset + 0.2);
+          });
+        } catch (e) { /* kein Ton ist besser als ein Fehler */ }
+      },
+      close() { try { if (ctx) ctx.close(); } catch (e) { /* egal */ } ctx = null; },
+    };
+  }
+
+  ui.pages['spielabend/uhr'] = () => {
+    const st = turnierStore();
+    const saved = st.load().tournament;
+    const render = ui.makeView({ back: true, sheet: false });
+    const plan = saved ? T.planTournament(saved.setup) : null;
+    if (!saved || !plan || !plan.ok) {
+      render(h('div', { class: 'panel' },
+        h('h1', {}, 'Blinds-Uhr'),
+        h('p', {}, 'Es gibt noch keinen Turnierplan. Richte ihn zuerst im Turnier-Planer ein – danach läuft die Uhr.'),
+        h('a', { class: 'btn', href: '#/spielabend/turnier' }, 'Zum Turnier-Planer')));
+      return;
+    }
+
+    const schedule = plan.schedule;
+    const lastIndex = schedule.length - 1;
+    const beeper = makeBeeper();
+    let clock = saved.clock;
+    let soundOn = false;
+    let left = false;
+    let finishedShown = T.clockView(schedule, clock, Date.now()).finished; // beim Öffnen einer fertigen Uhr nicht erneut melden
+    let sentinel = null;
+    let wakeState = 'idle'; // idle | on | unsupported
+    let bannerTimer = null;
+    const originalTitle = document.title;
+
+    const bannerEl = h('div', { class: 'clock-banner', role: 'status', 'aria-live': 'assertive', hidden: true });
+    const levelEl = h('div', { class: 'clock-level' });
+    const blindsEl = h('div', { class: 'clock-blinds' });
+    const timeEl = h('div', { class: 'clock-time', role: 'timer', 'aria-live': 'off' });
+    const barFill = h('span', {});
+    const nextEl = h('div', { class: 'clock-next' });
+    const wakeEl = h('p', { class: 'muted small clock-wake' });
+    const toggleBtn = ui.button('Start', toggle, 'btn clock-toggle');
+    const prevBtn = ui.button('◀ Stufe zurück', () => jump(-1), 'btn ghost');
+    const nextBtn = ui.button('Nächste Stufe ▶', () => jump(1), 'btn ghost');
+    const lessBtn = ui.button('− 1 Min.', () => shift(-1), 'btn ghost');
+    const moreBtn = ui.button('+ 1 Min.', () => shift(1), 'btn ghost');
+    const soundBtn = ui.button('Signalton: aus', toggleSound, 'btn ghost');
+    soundBtn.setAttribute('aria-pressed', 'false');
+    let fullscreenBtn = null;
+    const fullscreenLabel = () => (document.fullscreenElement ? 'Vollbild beenden' : 'Vollbild');
+
+    const persist = () => st.saveClock(clock);
+
+    function announce(text) {
+      bannerEl.textContent = text;
+      bannerEl.hidden = false;
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => { bannerEl.hidden = true; }, 8000);
+      if (soundOn) beeper.beep();
+    }
+
+    function announceEntry(entry) {
+      announce(entry.type === 'break' ? `Pause – ${entry.minutes} Minuten` : `Neue Blinds: ${blinds(entry)} (Stufe ${entry.n})`);
+    }
+
+    function drawWake() {
+      wakeEl.textContent = wakeState === 'on' ? 'Der Bildschirm bleibt an, solange die Uhr läuft.'
+        : wakeState === 'unsupported' ? 'Dieses Gerät kann den Bildschirm nicht wachhalten. Stelle die automatische Sperre auf „Nie“ oder tippe ab und zu auf den Bildschirm. Die Zeit stimmt auch nach einer Sperre.'
+          : T.clockView(schedule, clock, Date.now()).running ? 'Der Bildschirm wird wieder wachgehalten, sobald die Seite sichtbar ist.' : 'Beim Start bleibt der Bildschirm an.';
+    }
+
+    async function requestWake() {
+      if (left) return;
+      if (!navigator.wakeLock || typeof navigator.wakeLock.request !== 'function') { wakeState = 'unsupported'; drawWake(); return; }
+      try {
+        const lock = await navigator.wakeLock.request('screen');
+        if (left) { lock.release().catch(() => {}); return; }
+        sentinel = lock;
+        wakeState = 'on';
+        lock.addEventListener('release', () => { if (sentinel === lock) { sentinel = null; wakeState = 'idle'; drawWake(); } });
+      } catch (e) {
+        wakeState = 'unsupported';
+      }
+      drawWake();
+    }
+
+    function releaseWake() {
+      if (sentinel) { sentinel.release().catch(() => {}); sentinel = null; }
+      wakeState = 'idle';
+      drawWake();
+    }
+
+    function draw(view) {
+      const e = view.entry;
+      const isBreak = e.type === 'break';
+      levelEl.textContent = isBreak ? `Pause nach Stufe ${schedule[view.index - 1].n}` : `Stufe ${e.n} von ${plan.levels.length}`;
+      blindsEl.textContent = isBreak ? 'Pause' : blinds(e);
+      timeEl.textContent = clockText(view.remainingMs);
+      barFill.style.width = `${Math.round((view.elapsedMs / (e.minutes * 60000)) * 100)}%`;
+      nextEl.textContent = view.finished ? 'Letzte Stufe vorbei – die Blinds bleiben jetzt gleich.'
+        : !view.next ? 'Das ist die letzte Stufe.'
+          : view.next.type === 'break' ? `Danach: Pause (${view.next.minutes} Minuten)` : `Danach: ${blinds(view.next)}`;
+      const started = view.index > 0 || view.elapsedMs > 0;
+      toggleBtn.textContent = view.running ? 'Anhalten' : view.finished ? 'Fertig' : started ? 'Weiter' : 'Start';
+      toggleBtn.disabled = view.finished;
+      prevBtn.disabled = view.index === 0;
+      nextBtn.disabled = view.index === lastIndex;
+      moreBtn.disabled = view.elapsedMs <= 0 && !view.finished; // am Anfang einer Stufe gibt es nichts zu verlängern
+      document.title = view.finished ? 'Letzte Stufe vorbei – Poker lernen' : `${isBreak ? 'Pause' : blinds(e)} · ${clockText(view.remainingMs)} – Poker lernen`;
+    }
+
+    function tick() {
+      if (left) return;
+      const t = Date.now();
+      if (clock.runningSince !== null && clock.runningSince > t) { clock = { ...clock, runningSince: t }; persist(); } // Systemuhr wurde zurückgestellt: neu verankern
+      const n = T.normalizeClock(schedule, clock, t);
+      if (n.crossed.length || (n.finished && !finishedShown)) {
+        clock = n.clock;
+        persist();
+        if (n.crossed.length) announceEntry(schedule[n.clock.index]);
+        if (n.finished && !finishedShown) { finishedShown = true; announce('Letzte Stufe vorbei – die Blinds bleiben jetzt gleich.'); releaseWake(); }
+      }
+      draw(T.clockView(schedule, clock, t));
+    }
+
+    function toggle() {
+      const t = Date.now();
+      const running = T.clockView(schedule, clock, t).running;
+      if (running) { clock = T.pauseClock(schedule, clock, t); releaseWake(); } else { clock = T.startClock(schedule, clock, t); requestWake(); }
+      persist();
+      tick();
+    }
+
+    function jump(delta) {
+      const t = Date.now();
+      const before = T.clockView(schedule, clock, t).index;
+      clock = T.jumpEntry(schedule, clock, delta, t);
+      finishedShown = T.clockView(schedule, clock, t).finished;
+      persist();
+      const view = T.clockView(schedule, clock, t);
+      if (view.index !== before) announceEntry(view.entry);
+      if (view.running && wakeState !== 'on') requestWake();
+      tick();
+    }
+
+    function shift(minutes) {
+      clock = T.shiftTime(schedule, clock, minutes * 60000, Date.now());
+      finishedShown = T.clockView(schedule, clock, Date.now()).finished;
+      persist();
+      tick();
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      if (soundOn) { beeper.unlock(); beeper.beep(); }
+      soundBtn.textContent = soundOn ? 'Signalton: an' : 'Signalton: aus';
+      soundBtn.setAttribute('aria-pressed', String(soundOn));
+    }
+
+    function restart() {
+      if (!window.confirm('Die Uhr beginnt wieder bei Stufe 1. Weiter?')) return;
+      clock = T.createClock();
+      finishedShown = false;
+      bannerEl.hidden = true;
+      persist();
+      releaseWake();
+      tick();
+    }
+
+    fullscreenBtn = document.fullscreenEnabled
+      ? ui.button(fullscreenLabel(), () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }, 'btn ghost fs-btn')
+      : null;
+
+    drawWake();
+    ui.state.root.classList.add('wide');
+    render(h('div', { class: 'clock-page' },
+      bannerEl, levelEl, blindsEl, timeEl,
+      h('div', { class: 'clock-bar', 'aria-hidden': 'true' }, barFill),
+      nextEl,
+      h('div', { class: 'clock-controls' },
+        toggleBtn,
+        h('div', { class: 'clock-row' }, prevBtn, nextBtn),
+        h('div', { class: 'clock-row' }, lessBtn, moreBtn)),
+      h('div', { class: 'clock-extras' }, fullscreenBtn, soundBtn, ui.button('Neu starten', restart, 'btn ghost')),
+      wakeEl,
+      h('p', { class: 'muted small' }, h('a', { href: '#/spielabend/turnier' }, 'Plan ansehen oder ändern'))));
+
+    const timer = setInterval(tick, 250);
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      tick();
+      if (T.clockView(schedule, clock, Date.now()).running && !sentinel) requestWake();
+    };
+    const onFullscreen = () => { if (fullscreenBtn) fullscreenBtn.textContent = fullscreenLabel(); };
+    document.addEventListener('visibilitychange', onVisible);
+    document.addEventListener('fullscreenchange', onFullscreen);
+    ui.onLeave(() => {
+      left = true;
+      clearInterval(timer);
+      clearTimeout(bannerTimer);
+      document.removeEventListener('visibilitychange', onVisible);
+      document.removeEventListener('fullscreenchange', onFullscreen);
+      if (sentinel) { sentinel.release().catch(() => {}); sentinel = null; }
+      beeper.close();
+      document.title = originalTitle;
+      ui.state.root.classList.remove('wide');
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    });
+    tick();
+    if (T.clockView(schedule, clock, Date.now()).running) requestWake();
+  };
+})(globalThis.Poker);
+</script>
+
+<script id="m-ui-tischabend">
+// Tischabend: Sitzplatz-Auslosung, Tischregeln-Zettel und Glossar. Namen und Suchtext kommen nur als Text auf die Seite, nie als HTML.
+(function (P) {
+  const ui = P.ui;
+  const { h } = ui;
+  const T = P.tischabend;
+
+  // --- Auslosung ---
+
+  ui.pages['spielabend/auslosung'] = () => {
+    let result = null;
+    const countInput = h('input', { type: 'number', inputmode: 'numeric', id: 'f-count', min: '2', max: '10', step: '1', value: '6' });
+    const namesInput = h('textarea', { id: 'f-names', rows: '5', placeholder: 'Anna\nBen\nCem', autocomplete: 'off', spellcheck: 'false', autocapitalize: 'words' });
+    const out = h('div', { class: 'draw-result' });
+    const nameOf = (seat) => result.seats[seat - 1].name;
+
+    function seatTags(seat) {
+      const tags = [];
+      if (seat === result.button) tags.push(result.seats.length === 2 ? 'Button und kleiner Blind' : 'Button');
+      if (seat === result.smallBlind && result.seats.length > 2) tags.push('kleiner Blind');
+      if (seat === result.bigBlind) tags.push('großer Blind');
+      return tags;
+    }
+
+    function ring() {
+      const n = result.seats.length;
+      return h('div', { class: 'draw-ring', 'aria-hidden': 'true' },
+        h('div', { class: 'draw-center' }, 'Tisch'),
+        result.seats.map((s) => {
+          const angle = (-90 + ((s.seat - 1) * 360) / n) * (Math.PI / 180);
+          const x = 50 + 40 * Math.cos(angle);
+          const y = 50 + 40 * Math.sin(angle);
+          return h('div', { class: 'draw-seat' + (s.seat === result.button ? ' is-button' : ''), style: `left:${x.toFixed(1)}%;top:${y.toFixed(1)}%` },
+            h('span', { class: 'draw-num' }, String(s.seat)),
+            h('span', { class: 'draw-name' }, s.name),
+            h('span', { class: 'draw-tag' }, seatTags(s.seat).map((t) => (t === 'großer Blind' ? 'BB' : t === 'kleiner Blind' ? 'SB' : t === 'Button und kleiner Blind' ? 'Button · SB' : 'Button')).join(' · ')));
+        }));
+    }
+
+    function show() {
+      if (!result) { out.replaceChildren(); return; }
+      const n = result.seats.length;
+      const heading = h('h2', { tabindex: '-1' }, 'Eure Plätze');
+      out.replaceChildren(
+        h('section', { class: 'panel' },
+          heading,
+          ring(),
+          h('p', { class: 'muted small' }, 'Die Plätze sind im Uhrzeigersinn nummeriert, von oben auf den Tisch gesehen.'),
+          h('ul', { class: 'draw-list' }, result.seats.map((s) => h('li', {}, h('strong', {}, `Platz ${s.seat}: ${s.name}`), seatTags(s.seat).length ? ` – ${seatTags(s.seat).join(', ')}` : ''))),
+          h('p', {}, n === 2
+            ? `Zu zweit ist der Button zugleich der kleine Blind: ${nameOf(result.button)} (Platz ${result.button}) ist Button und kleiner Blind, ${nameOf(result.bigBlind)} (Platz ${result.bigBlind}) ist großer Blind.`
+            : `Button: ${nameOf(result.button)} (Platz ${result.button}). Kleiner Blind: ${nameOf(result.smallBlind)} (Platz ${result.smallBlind}). Großer Blind: ${nameOf(result.bigBlind)} (Platz ${result.bigBlind}).`),
+          h('div', { class: 'actions' },
+            ui.button('Button neu losen', () => {
+              const r = T.drawButton(n, ui.state.rng);
+              if (r.ok) { result = { ...result, button: r.button, smallBlind: r.smallBlind, bigBlind: r.bigBlind }; show(); }
+            }, 'btn ghost'),
+            ui.button('Neu auslosen', draw))));
+      heading.focus({ preventScroll: true }); // der Fokus bleibt im Ergebnis, nicht auf der Seite davor
+    }
+
+    function draw() {
+      const text = namesInput.value;
+      let r;
+      if (text.trim()) {
+        const parsed = T.parseNames(text);
+        if (!parsed.ok) { result = null; out.replaceChildren(h('p', { class: 'notice', role: 'alert' }, parsed.message)); return; }
+        r = T.drawSeats({ names: parsed.names }, ui.state.rng);
+      } else {
+        r = T.drawSeats({ count: countInput.value }, ui.state.rng);
+      }
+      if (!r.ok) { result = null; out.replaceChildren(h('p', { class: 'notice', role: 'alert' }, r.message)); return; }
+      result = r;
+      show();
+    }
+
+    ui.show(h('div', { class: 'draw' },
+      h('h1', {}, 'Sitzplatz-Auslosung'),
+      h('p', { class: 'lead' }, 'Wer sitzt wo, und wer bekommt den Button? Tippe auf „Auslosen“. Mit Namen werden auch die Plätze gemischt.'),
+      h('section', { class: 'panel' },
+        h('div', { class: 'field-grid' },
+          h('div', { class: 'field' }, h('label', { for: 'f-count' }, 'Spielerzahl'), countInput, h('div', { class: 'hint' }, 'Zwischen 2 und 10. Wird ignoriert, sobald Namen dastehen.')),
+          h('div', { class: 'field field-wide' }, h('label', { for: 'f-names' }, 'Namen (freiwillig)'), namesInput, h('div', { class: 'hint' }, 'Einer pro Zeile oder mit Komma getrennt. Die Namen werden nicht gespeichert.'))),
+        h('div', { class: 'actions' }, ui.button('Auslosen', draw))),
+      out), { sheet: false, back: true });
+  };
+
+  // --- Tischregeln-Zettel ---
+
+  ui.pages['spielabend/tischregeln'] = () => {
+    ui.show(h('div', { class: 'zettel plan-print' },
+      h('div', { class: 'tafel-head' },
+        h('h1', {}, 'Tischregeln'),
+        h('span', { class: 'no-print tafel-buttons' }, ui.button('Drucken', () => window.print(), 'btn ghost'))),
+      h('p', { class: 'lead' }, 'Eine Empfehlung für Runden mit Freunden, angelehnt an die Regeln großer Pokerturniere. Einigt euch vor der ersten Hand. Was mit „Vorher abstimmen“ markiert ist, ist Geschmackssache.'),
+      h('div', { class: 'zettel-groups' }, T.houseRules.map((group) => h('section', { class: 'zettel-group' },
+        h('h2', {}, group.title),
+        h('ul', {}, group.rules.map((rule) => h('li', {}, rule.text, rule.vote ? h('span', { class: 'vote-tag' }, 'Vorher abstimmen') : null)))))),
+      h('section', { class: 'zettel-group zettel-own' },
+        h('h2', {}, 'Bei uns gilt außerdem'),
+        h('div', { class: 'write-lines', 'aria-hidden': 'true' }, [0, 1, 2, 3].map(() => h('div', {}))))), { sheet: false, back: true });
+  };
+
+  // --- Glossar ---
+
+  ui.pages['spielabend/glossar'] = () => {
+    const list = h('div', { class: 'gl-list' });
+    const count = h('p', { class: 'muted small', 'aria-live': 'polite' });
+
+    function entry(e) {
+      return h('article', { class: 'gl-entry' },
+        h('h3', {}, e.term, e.en ? h('span', { class: 'gl-en' }, ` (${e.en})`) : null),
+        e.alt ? h('div', { class: 'gl-alt muted small' }, `auch: ${e.alt}`) : null,
+        h('p', {}, e.text));
+    }
+
+    function refresh() {
+      const query = input.value;
+      const found = T.searchGlossary(query);
+      const searching = T.hasSearchTerms(query);
+      count.textContent = searching ? `${found.length} Treffer` : `${found.length} Begriffe`;
+      if (!found.length) {
+        list.replaceChildren(h('p', { class: 'notice' }, 'Nichts gefunden. Probiere ein anderes Wort, zum Beispiel „Flop“ oder „Blinds“.'));
+        return;
+      }
+      const nodes = [];
+      let letter = '';
+      for (const e of found) {
+        const first = e.term.charAt(0).toUpperCase();
+        if (!searching && first !== letter) { letter = first; nodes.push(h('h2', { class: 'gl-letter' }, letter)); }
+        nodes.push(entry(e));
+      }
+      list.replaceChildren(...nodes);
+    }
+
+    const input = h('input', {
+      type: 'search', class: 'gl-search', id: 'gl-q', placeholder: 'Begriff suchen, zum Beispiel Flop', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false',
+      'aria-label': 'Begriff suchen', oninput: refresh,
+    });
+    ui.show(h('div', { class: 'glossar' },
+      h('h1', {}, 'Glossar'),
+      h('p', { class: 'lead' }, 'Die Fachwörter vom Pokertisch in einfachen Worten. Du kannst auch das englische Wort suchen.'),
+      input, count, list), { sheet: false, back: true });
+    refresh();
   };
 })(globalThis.Poker);
 </script>

@@ -1,6 +1,6 @@
 // Service Worker für „Poker lernen“. scripts/build-site.mjs setzt Version und Dateiliste ein (sw.js entsteht beim Bauen von site/).
 // Strategie: zuerst das Netz (damit neue Versionen sofort ankommen), ohne Netz oder bei Fehler die Kopie aus dem Cache.
-const VERSION = 'c506495b2acd';
+const VERSION = '6f35155cb182';
 const FILES = ["./","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
 const CACHE = 'poker-' + VERSION;
 const NETWORK_LIMIT_MS = 4000;
