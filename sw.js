@@ -1,12 +1,19 @@
 // Service Worker für „Poker lernen“. scripts/build-site.mjs setzt Version und Dateiliste ein (sw.js entsteht beim Bauen von site/).
 // Strategie: zuerst das Netz (damit neue Versionen sofort ankommen), ohne Netz oder bei Fehler die Kopie aus dem Cache.
-const VERSION = 'afb2b4ee3ad2';
+const VERSION = '115459f2fcf8';
 const FILES = ["./","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
 const CACHE = 'poker-' + VERSION;
 const NETWORK_LIMIT_MS = 4000;
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)).then(() => self.skipWaiting()));
+  // Jede Datei einzeln mit cache: 'reload' holen: der HTTP-Cache (GitHub Pages liefert Dateien
+  // bis zu zehn Minuten alt aus) soll eine neue Version nicht verzögern.
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => Promise.all(FILES.map((file) => fetch(file, { cache: 'reload' }).then((response) => {
+      if (!response.ok) throw new Error(`Vorladen fehlgeschlagen: ${file}`);
+      return cache.put(file, response);
+    })))).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -29,7 +36,7 @@ async function networkFirst(request) {
   const cached = (await cache.match(request)) || (request.mode === 'navigate' ? await cache.match('./') : undefined);
   const network = fetch(request, { cache: 'no-cache' }).then((response) => {
     if (response.ok) {
-      cache.put(request, response.clone());
+      cache.put(request, response.clone()).catch(() => {}); // bei vollem Speicher oder 206 kommt die Antwort trotzdem an
       return response;
     }
     return cached || response; // eine Fehlerantwort des Servers ersetzt keine gute Kopie
